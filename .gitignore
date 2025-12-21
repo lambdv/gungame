@@ -1,0 +1,31 @@
+# IDE and editor files
+/.vscode
+/.cursor
+/client/.vscode
+
+# Godot specific ignores
+/client/.godot/
+/client/.godot/imported/
+/client/android/
+/client/html5/
+
+# Build artifacts and exports
+exports/
+/server/rust/*/target/
+/server/rust/*/.gitignore
+/server/rust/*/Cargo.lock
+
+# Import files (Godot metadata)
+/client/**/*.import
+
+# Temporary files
+*.tmp
+*.tmp.*
+*~
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Scripts (may contain sensitive data or build scripts)
+scripts/

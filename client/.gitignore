@@ -1,0 +1,21 @@
+# Godot 4+ specific ignores
+.godot/
+.godot/imported/
+.godot/editor_layout.cfg
+.godot/editor_settings-*.tres
+/android/
+html5/
+
+# Import files (Godot metadata)
+**/*.import
+
+# Export presets (may contain sensitive paths)
+/export_presets.cfg
+
+# Build artifacts
+export_presets.cfg~
+
+# Temporary files
+*.tmp
+*.tmp.*
+*~

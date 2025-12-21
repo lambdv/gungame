@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://bpi1unhvdh6nj"]
+
+[ext_resource type="PackedScene" uid="uid://biesr31esx1fk" path="res://assets/mobs/Rachel_Lovell__Lovellverse_-510f9c50/fbx/rachel__black_heart_lovell_v5vrm.fbx" id="1_r1ln0"]
+
+[node name="rachel__black_heart_lovell_v5vrm" instance=ExtResource("1_r1ln0")]
+
+[node name="Light" parent="." index="1"]
+visible = false
