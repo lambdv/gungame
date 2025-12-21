@@ -11,6 +11,10 @@ var lobby_item_scene: PackedScene = preload("res://ui/lobby_item.tscn")
 var _is_joining_random: bool = false
 
 func _ready() -> void:
+	# Release mouse capture for UI interaction
+	if InputManager:
+		InputManager.release_mouse()
+	
 	networking_manager = get_node("/root/NetworkingManager")
 	networking_manager.lobby_list_received.connect(_on_lobby_list_received)
 	networking_manager.lobby_created.connect(_on_lobby_created)
@@ -70,6 +74,7 @@ func _on_random_pressed() -> void:
 	networking_manager.get_lobby_list()
 
 func _on_join_lobby_pressed(lobby_code: String) -> void:
+	print("Join lobby pressed for code: ", lobby_code)
 	networking_manager.join_lobby(lobby_code)
 	_set_buttons_enabled(false)
 

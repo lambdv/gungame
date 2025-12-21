@@ -12,26 +12,35 @@ var lobby_data: Dictionary
 func setup(data: Dictionary) -> void:
 	lobby_data = data
 
-	lobby_code_label.text = data.get("code", "UNKNOWN")
+	if lobby_code_label:
+		lobby_code_label.text = data.get("code", "UNKNOWN")
+
 	var player_count = data.get("player_count", 0)
 	var max_players = data.get("max_players", 4)
-	player_count_label.text = "%d / %d players" % [player_count, max_players]
+
+	if player_count_label:
+		player_count_label.text = "%d / %d players" % [player_count, max_players]
 
 	var scene = data.get("scene", "world")
-	match scene:
-		"world":
-			scene_label.text = "World Map"
-		_:
-			scene_label.text = scene.capitalize()
+	if scene_label:
+		match scene:
+			"world":
+				scene_label.text = "World Map"
+			_:
+				scene_label.text = scene.capitalize()
 
 	# Disable join button if lobby is full
-	join_button.disabled = player_count >= max_players
-	if join_button.disabled:
-		join_button.text = "FULL"
-	else:
-		join_button.text = "JOIN"
+	if join_button:
+		join_button.disabled = player_count >= max_players
+		if join_button.disabled:
+			join_button.text = "FULL"
+		else:
+			join_button.text = "JOIN"
 
-	join_button.connect("pressed", Callable(self, "_on_join_pressed"))
+		# Connect button signal (only once per instance)
+		if not join_button.pressed.is_connected(_on_join_pressed):
+			join_button.pressed.connect(_on_join_pressed)
 
 func _on_join_pressed() -> void:
+	print("Join button pressed for lobby: ", lobby_data.get("code", "unknown"))
 	join_pressed.emit()
