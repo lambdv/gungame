@@ -29,6 +29,7 @@ Thumbs.db
 
 # Scripts (may contain sensitive data or build scripts)
 scripts/
+!scripts/run-test-server.*
 
 # Assets (keep locally but don't track in git)
 client/assets/
