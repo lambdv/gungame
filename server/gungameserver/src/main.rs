@@ -77,6 +77,7 @@ enum ClientMessage {
     TakeDamage { damage: u32, attacker_id: u32 }, // For server validation
     Reload {},
     RequestState {}, // Client requesting their current state
+    WeaponSwitch { weapon_id: u32 }, // Client switching weapons
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -95,6 +96,21 @@ enum ServerMessage {
     PlayerDamaged { client_id: u32, damage: u32, attacker_id: u32 },
     ReloadStarted { client_id: u32 },
     ReloadFinished { client_id: u32 },
+    StateSync {  // Periodic full state synchronization for all players
+        players: Vec<PlayerSyncState>,
+    },
+    WeaponSwitched { client_id: u32, weapon_id: u32 }, // Player switched weapons
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct PlayerSyncState {
+    id: u32,
+    health: u32,
+    max_health: u32,
+    current_weapon_id: u32,
+    current_ammo: u32,
+    max_ammo: u32,
+    is_reloading: bool,
 }
 
 type LobbyCode = String;
@@ -404,6 +420,49 @@ impl GameServer {
         lobby.players.get(&player_id).ok_or("Player not found")
     }
 
+    /// Handle player weapon switching (server-authoritative)
+    pub fn player_switch_weapon(&mut self, lobby_code: &str, player_id: u32, weapon_id: u32) -> Result<(), &'static str> {
+        let lobby = self.lobbies.get_mut(lobby_code).ok_or("Lobby not found")?;
+        let player = lobby.players.get_mut(&player_id).ok_or("Player not found")?;
+
+        // Validate weapon exists
+        if !self.weapons.contains_key(&weapon_id) {
+            return Err("Invalid weapon");
+        }
+
+        // Update player's weapon and reset ammo to max for new weapon
+        let weapon = self.weapons.get(&weapon_id).unwrap();
+        player.current_weapon_id = weapon_id;
+        player.current_ammo = weapon.ammo;
+        player.max_ammo = weapon.ammo;
+
+        // Cancel any ongoing reload
+        player.is_reloading = false;
+        player.reload_end_time = None;
+
+        Ok(())
+    }
+
+    /// Get full state sync data for all players in a lobby
+    pub fn get_lobby_state_sync(&self, lobby_code: &str) -> Result<Vec<PlayerSyncState>, &'static str> {
+        let lobby = self.lobbies.get(lobby_code).ok_or("Lobby not found")?;
+
+        let mut player_states = Vec::new();
+        for player in lobby.players.values() {
+            player_states.push(PlayerSyncState {
+                id: player.id,
+                health: player.current_health,
+                max_health: player.max_health,
+                current_weapon_id: player.current_weapon_id,
+                current_ammo: player.current_ammo,
+                max_ammo: player.max_ammo,
+                is_reloading: player.is_reloading,
+            });
+        }
+
+        Ok(player_states)
+    }
+
     /// Clean up inactive players and empty lobbies
     /// Returns the number of players removed and lobbies deleted
     pub fn cleanup_inactive_players_and_empty_lobbies(&mut self) -> (usize, usize) {
@@ -688,8 +747,61 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     });
 
+    // State synchronization task - runs every 500ms with change detection
+    let sync_game_server = game_server.clone();
+    let sync_socket = udp_socket_clone.clone();
+    let sync_task = tokio::spawn(async move {
+        let mut interval = interval(Duration::from_millis(500)); // 2 updates per second
+        let mut last_sync_states: HashMap<String, Vec<PlayerSyncState>> = HashMap::new();
+
+        loop {
+            interval.tick().await;
+            let server = sync_game_server.read().await;
+
+            // Send state sync to all lobbies only if state changed
+            for (lobby_code, lobby) in &server.lobbies {
+                if let Ok(current_states) = server.get_lobby_state_sync(lobby_code) {
+                    // Check if state has actually changed
+                    let should_sync = if let Some(last_states) = last_sync_states.get(lobby_code) {
+                        // Compare relevant state (health, ammo, weapon, reload) - exclude position/rotation
+                        !current_states.iter().zip(last_states.iter()).all(|(curr, last)| {
+                            curr.id == last.id &&
+                            curr.health == last.health &&
+                            curr.max_health == last.max_health &&
+                            curr.current_weapon_id == last.current_weapon_id &&
+                            curr.current_ammo == last.current_ammo &&
+                            curr.max_ammo == last.max_ammo &&
+                            curr.is_reloading == last.is_reloading
+                        })
+                    } else {
+                        // First time syncing this lobby
+                        true
+                    };
+
+                    if should_sync {
+                        let state_sync_packet = serde_json::json!({
+                            "type": "state_sync",
+                            "players": current_states
+                        });
+                        let packet_data = serde_json::to_vec(&state_sync_packet).unwrap();
+
+                        // Send to all clients in the lobby
+                        for (client_id, client_addr) in &lobby.client_addresses {
+                            if let Err(e) = sync_socket.send_to(&packet_data, *client_addr).await {
+                                println!("Failed to send state sync to player {}: {:?}", client_id, e);
+                            }
+                        }
+
+                        // Update last sync state
+                        last_sync_states.insert(lobby_code.clone(), current_states);
+                    }
+                }
+            }
+        }
+    });
+
     // Wait for all tasks
-    tokio::try_join!(http_server, udp_server, dummy_mover, cleanup_task)?;
+    tokio::try_join!(http_server, udp_server, dummy_mover, cleanup_task, sync_task)?;
 
     Ok(())
 }
@@ -1005,6 +1117,36 @@ async fn handle_udp_packet(
                     });
 
                     let _ = socket.send_to(&serde_json::to_vec(&state_packet).unwrap(), addr).await;
+                }
+            }
+        }
+        Some("weapon_switch") => {
+            let lobby_code = packet.get("lobby_code").and_then(|v| v.as_str());
+            let player_id = packet.get("player_id").and_then(|v| v.as_u64());
+            let weapon_id = packet.get("weapon_id").and_then(|v| v.as_u64());
+
+            if let (Some(code), Some(pid), Some(wid)) = (lobby_code, player_id, weapon_id) {
+                let mut server = game_server.write().await;
+
+                if let Ok(()) = server.player_switch_weapon(code, pid as u32, wid as u32) {
+                    println!("Player {} switched to weapon {}", pid, wid);
+
+                    // Broadcast weapon switch to all clients in lobby
+                    if let Some(lobby) = server.lobbies.get(code) {
+                        let weapon_switch_packet = serde_json::json!({
+                            "type": "weapon_switched",
+                            "player_id": pid,
+                            "weapon_id": wid
+                        });
+                        let packet_data = serde_json::to_vec(&weapon_switch_packet).unwrap();
+
+                        // Send to all clients in the lobby
+                        for (client_id, client_addr) in &lobby.client_addresses {
+                            if let Err(e) = socket.send_to(&packet_data, *client_addr).await {
+                                println!("Failed to send weapon switch to player {}: {:?}", client_id, e);
+                            }
+                        }
+                    }
                 }
             }
         }

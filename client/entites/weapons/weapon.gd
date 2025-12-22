@@ -182,3 +182,22 @@ func _on_reload_finished() -> void:
 
 func is_weapon_reloading() -> bool:
 	return is_reloading
+
+## set_current_ammo
+## Externally sets current ammo (used for server synchronization)
+## @param ammo: New ammo count
+func set_current_ammo(ammo: int) -> void:
+	current_ammo = ammo
+
+## set_max_ammo
+## Externally sets max ammo (used for server synchronization)
+## @param ammo: New max ammo count
+func set_max_ammo(ammo: int) -> void:
+	ammo = ammo
+
+## set_reloading_state
+## Externally sets reload state (used for server synchronization)
+## @param reloading: Whether weapon should be reloading
+func set_reloading_state(reloading: bool) -> void:
+	is_reloading = reloading
+	can_shoot = not reloading

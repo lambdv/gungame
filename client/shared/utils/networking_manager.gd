@@ -60,6 +60,9 @@ signal server_dummy_updated(position: Vector3)  # Server-controlled bot position
 signal connection_confirmed()  # Fired when UDP connection to game server is confirmed
 signal connection_state_changed(new_state: ConnectionState)  # Fired when connection state changes
 signal reconnection_attempt(attempt: int, max_attempts: int)  # Fired during reconnection attempts
+signal state_sync_received(player_states: Array)  # Fired when full state sync is received from server
+signal weapon_switched(player_id: int, weapon_id: int)  # Fired when a player switches weapons
+signal player_damaged(player_id: int, damage: int, attacker_id: int)  # Fired when a player takes damage
 
 func _ready() -> void:
 	_setup_http_client()
@@ -339,6 +342,19 @@ func send_position_update(position: Vector3, rotation: Vector3) -> void:
 
 	_send_udp_packet(packet)
 
+func send_weapon_switch(weapon_id: int) -> void:
+	if not connected_to_udp:
+		return
+
+	var packet = {
+		"type": "weapon_switch",
+		"lobby_code": current_lobby.get("code", ""),
+		"player_id": player_id,
+		"weapon_id": weapon_id
+	}
+
+	_send_udp_packet(packet)
+
 func _send_udp_packet(data: Dictionary) -> void:
 	if not connected_to_udp:
 		return
@@ -373,8 +389,8 @@ func _process(_delta: float) -> void:
 			if parse_result == OK:
 				last_udp_activity = Time.get_ticks_msec() / 1000.0
 				var packet_type = json.data.get("type", "unknown")
-				# Reduce spam for frequent packet types
-				if packet_type != "server_dummy_update":
+				# Reduce spam for frequent packet types - only log important events
+				if packet_type not in ["server_dummy_update", "state_sync", "position_update"]:
 					print("UDP: Received packet '" + packet_type + "'")
 				_process_udp_packet(json.data)
 				packets_processed += 1
@@ -429,8 +445,13 @@ func _process_udp_packet(data: Dictionary) -> void:
 				pos_data.get("z", 0.0)
 			)
 
-			# TODO: Server currently doesn't send rotation updates
-			var rotation = Vector3.ZERO
+			# Extract rotation data from the packet
+			var rot_data = data.get("rotation", {})
+			var rotation = Vector3(
+				rot_data.get("x", 0.0),
+				rot_data.get("y", 0.0),
+				rot_data.get("z", 0.0)
+			)
 
 			position_update_received.emit(remote_player_id, position, rotation)
 
@@ -455,6 +476,24 @@ func _process_udp_packet(data: Dictionary) -> void:
 				pos_data.get("z", 0.0)
 			)
 			server_dummy_updated.emit(position)
+
+		"state_sync":
+			# Full state synchronization from server - contains all player states
+			var player_states = data.get("players", [])
+			state_sync_received.emit(player_states)
+
+		"weapon_switched":
+			# A player switched weapons
+			var remote_player_id = data.get("player_id", -1)
+			var weapon_id = data.get("weapon_id", -1)
+			weapon_switched.emit(remote_player_id, weapon_id)
+
+		"player_damaged":
+			# A player was damaged
+			var damaged_player_id = data.get("player_id", -1)
+			var damage_amount = data.get("damage", 0)
+			var attacker_id = data.get("attacker_id", -1)
+			player_damaged.emit(damaged_player_id, damage_amount, attacker_id)
 
 # Test lobby methods
 func connect_to_test_lobby() -> void:

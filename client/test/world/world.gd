@@ -38,6 +38,7 @@ func _ready() -> void:
 	NetworkingManager.position_update_received.connect(_on_position_update_received)
 	NetworkingManager.server_dummy_updated.connect(_on_server_dummy_updated)
 	NetworkingManager.connection_confirmed.connect(_on_connection_confirmed)
+	NetworkingManager.state_sync_received.connect(_on_state_sync_received)
 
 	# Connect to local player death signal to handle respawning
 	# We'll connect this when the player is spawned
@@ -163,8 +164,35 @@ func _on_position_update_received(player_id: int, position: Vector3, rotation: V
 	if player_id in remote_players:
 		var player_instance = remote_players[player_id]
 		if is_instance_valid(player_instance):
-			player_instance.position = position
-			player_instance.rotation = rotation
+			# Use smooth interpolation instead of direct position setting
+			if player_instance.has_method("update_target_position"):
+				player_instance.update_target_position(position, Vector3(rotation.x, rotation.y, 0.0))
+			else:
+				# Fallback to direct setting if interpolation method not available
+				player_instance.position = position
+				player_instance.rotation.y = rotation.x
+				player_instance.get_node("CameraRig/Head").rotation.x = rotation.y
+				if player_instance.character_model:
+					player_instance.character_model.rotation.x = rotation.y
+
+func _on_state_sync_received(player_states: Array) -> void:
+	# Apply state sync data to all players in the sync
+	for state_data in player_states:
+		var player_id = state_data.get("id", -1)
+
+		# Skip our own player - we control our own state locally
+		if player_id == NetworkingManager.player_id:
+			continue
+
+		# Ensure remote player exists
+		if player_id not in remote_players:
+			spawn_remote_player(player_id, {"id": player_id, "name": "Player" + str(player_id)})
+
+		# Apply state sync to the player
+		if player_id in remote_players:
+			var player_instance = remote_players[player_id]
+			if is_instance_valid(player_instance) and player_instance.has_method("apply_state_sync"):
+				player_instance.apply_state_sync(state_data)
 
 func cleanup_server_dummy() -> void:
 	if server_dummy and is_instance_valid(server_dummy):
@@ -184,6 +212,13 @@ func spawn_local_player() -> void:
 
 	player_instance.position = PLAYER_SPAWN_POSITION
 	player_instance.name = "LocalPlayer"
+
+	# Connect to networking manager for multiplayer commands
+	if player_instance.has_method("set_networking_manager"):
+		player_instance.set_networking_manager(NetworkingManager)
+	if player_instance.has_method("set_player_id"):
+		player_instance.set_player_id(NetworkingManager.player_id)
+
 	add_child(player_instance)
 	local_player = player_instance
 
@@ -207,13 +242,29 @@ func spawn_remote_player(player_id: int, player_data: Dictionary) -> void:
 		return
 
 	var player_instance = PLAYER_SCENE.instantiate()
-	player_instance.position = PLAYER_SPAWN_POSITION + Vector3(randf_range(-2, 2), 0, randf_range(-2, 2))
+	var spawn_pos = PLAYER_SPAWN_POSITION + Vector3(randf_range(-2, 2), 0, randf_range(-2, 2))
+	player_instance.position = spawn_pos
 	player_instance.name = "RemotePlayer_" + str(player_id)
 	add_child(player_instance)
 
 	# Make it non-local so it shows health bar and doesn't respond to input
 	if player_instance.has_method("set_is_local"):
 		player_instance.set_is_local(false)
+
+	# Disable collision for remote players to prevent physics interference
+	var collision_shape = player_instance.get_node_or_null("CollisionShape3D")
+	if collision_shape:
+		collision_shape.disabled = true
+
+	# Initialize interpolation target to spawn position to prevent teleporting from origin
+	if player_instance.has_method("update_target_position"):
+		player_instance.update_target_position(spawn_pos, Vector3.ZERO)
+
+	# Connect to networking manager for state synchronization
+	if player_instance.has_method("set_networking_manager"):
+		player_instance.set_networking_manager(NetworkingManager)
+	if player_instance.has_method("set_player_id"):
+		player_instance.set_player_id(player_id)
 
 	remote_players[player_id] = player_instance
 
@@ -312,5 +363,10 @@ func _process(delta: float) -> void:
 
 			# Send current position and rotation to server for broadcasting
 			var pos = local_player.position
-			var rot = local_player.rotation
+			# Send rotation as (horizontal_body, vertical_head, roll) for clarity
+			var rot = Vector3(
+				local_player.rotation.y,  # Horizontal body rotation (Y-axis)
+				local_player.get_node("CameraRig/Head").rotation.x,  # Vertical head rotation (X-axis)
+				0.0  # No roll
+			)
 			NetworkingManager.send_position_update(pos, rot)

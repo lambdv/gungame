@@ -1,0 +1,24 @@
+services:
+  gungame-server:
+    build:
+      context: .
+      dockerfile: scripts/Dockerfile.combined
+    ports:
+      - "8080:8080/tcp"    # Rust HTTP API
+      - "8081:8081/udp"    # Rust UDP Game Server
+      - "4242:4242/tcp"    # Godot Dedicated Server (default port)
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/lobbies"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 30s
+    environment:
+      - RUST_LOG=info
+    networks:
+      - gungame-network
+
+networks:
+  gungame-network:
+    driver: bridge
