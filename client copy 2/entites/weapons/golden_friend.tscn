@@ -1,5 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://bsnx7803hq15h"]
-
-[ext_resource type="PackedScene" uid="uid://hn378h0e4q2v" path="res://assets/props/guns/pixel_gun_golden_friend/scene.gltf" id="1_bjd3k"]
-
-[node name="Sketchfab_Scene" instance=ExtResource("1_bjd3k")]

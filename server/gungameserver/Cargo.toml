@@ -14,9 +14,11 @@ axum = { version = "0.7", features = ["json", "tokio"] }
 tower = "0.4"
 tower-http = { version = "0.5", features = ["cors"] }
 uuid = { version = "1.0", features = ["v4"] }
-log = "0.4"
+log = "0.4.29"
 fern = "0.6"
-chrono = { version = "0.4", features = ["serde"] }
+chrono = "0.4"
+dashmap = "5.5"
+smallvec = "1.11"
 
 [dev-dependencies]
 tokio-test = "0.4"
