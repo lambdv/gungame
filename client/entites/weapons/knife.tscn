@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://datnnhribfwp1"]
 
-[ext_resource type="PackedScene" uid="uid://bv3vj6vkafdsl" path="res://assets/props/guns/pixel_gun_3d_-_combat_knife/scene.gltf" id="1_kwm3r"]
+[ext_resource type="PackedScene" uid="uid://bqoeb7846l0v8" path="res://assets/props/guns/pixel_gun_3d_-_combat_knife/scene.gltf" id="1_kwm3r"]
 
 [node name="Sketchfab_Scene" instance=ExtResource("1_kwm3r")]
 transform = Transform3D(0.00424282, 0, -0.105316, 0, 0.105401, 0, 0.105316, 0, 0.00424282, 0, 0, 0)

@@ -61,7 +61,8 @@ func play_simple_attack_animation() -> void:
 	var base_position = position
 	var recoil_distance = 0.15  # Increased from 0.05 for more movement
 
-	current_tween.tween_property(self, "position", base_position + Vector3(0, 0, -recoil_distance), 0.1)
+	# Recoil backward (away from camera) - positive Z moves toward camera in Godot
+	current_tween.tween_property(self, "position", base_position + Vector3(0, 0, recoil_distance), 0.1)
 	current_tween.tween_property(self, "position", base_position, 0.1)
 	current_tween.tween_callback(func(): current_tween = null)
 
@@ -181,3 +182,22 @@ func _on_reload_finished() -> void:
 
 func is_weapon_reloading() -> bool:
 	return is_reloading
+
+## set_current_ammo
+## Externally sets current ammo (used for server synchronization)
+## @param ammo: New ammo count
+func set_current_ammo(ammo: int) -> void:
+	current_ammo = ammo
+
+## set_max_ammo
+## Externally sets max ammo (used for server synchronization)
+## @param ammo: New max ammo count
+func set_max_ammo(ammo: int) -> void:
+	ammo = ammo
+
+## set_reloading_state
+## Externally sets reload state (used for server synchronization)
+## @param reloading: Whether weapon should be reloading
+func set_reloading_state(reloading: bool) -> void:
+	is_reloading = reloading
+	can_shoot = not reloading

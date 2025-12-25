@@ -1,42 +1,55 @@
 extends Node
+## InputManager - Centralized Input Handling System
+##
+## Processes all player input and broadcasts it via signals to interested systems.
+## This centralizes input logic and allows for easy input remapping, UI focus management,
+## and state-based input filtering (e.g., disable input during pause menu).
+##
+## Key features:
+## - State-aware input processing (only processes input when game is in playing state)
+## - Mouse capture management for camera control vs UI interaction
+## - Signal-based communication to avoid tight coupling
+## - Frame-perfect input state tracking
 
-# Input state variables
-var movement_input := Vector2.ZERO
-var jump_pressed := false
-var jump_just_pressed := false
-var mouse_motion := Vector2.ZERO
-var mouse_captured := true
-var weapon_keys_pressed := [false, false, false]  # Track keys 1, 2, 3
+# Input state tracking - current state of all input devices
+var movement_input := Vector2.ZERO  # WASD/controller movement vector (-1 to 1)
+var jump_pressed := false  # Jump button held down
+var jump_just_pressed := false  # Jump button pressed this frame (edge trigger)
+var mouse_motion := Vector2.ZERO  # Mouse movement delta this frame
+var mouse_captured := true  # Whether mouse is captured for camera control
+var weapon_keys_pressed := [false, false, false]  # Track keys 1, 2, 3 for weapon switching
 
-# Signals for propagating input to other nodes
-signal movement_input_changed(input: Vector2)
-signal jump_pressed_changed(pressed: bool)
-signal jump_just_pressed_changed(pressed: bool)
-signal mouse_motion_changed(motion: Vector2)
-signal mouse_capture_changed(captured: bool)
-signal weapon_switch_requested(slot: int)
-signal attack_pressed
-signal reload_pressed
+# Signals - broadcast input changes to any system that needs them
+signal movement_input_changed(input: Vector2)  # Movement vector changed
+signal jump_pressed_changed(pressed: bool)  # Jump button state changed
+signal jump_just_pressed_changed(pressed: bool)  # Jump button just pressed
+signal mouse_motion_changed(motion: Vector2)  # Mouse moved
+signal mouse_capture_changed(captured: bool)  # Mouse capture state changed
+signal weapon_switch_requested(slot: int)  # Player wants to switch to weapon slot (1-3)
+signal attack_pressed  # Attack button pressed (allows holding)
+signal reload_pressed  # Reload button pressed
 
 func _ready() -> void:
 	# Capture mouse for camera control
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
+## _physics_process
+## Main input processing loop - called every physics frame (60fps)
+## Handles state-aware input processing and signal emission
 func _physics_process(_delta: float) -> void:
-	# Reset frame-based inputs
+	# Reset per-frame inputs that should only trigger once per press
 	jump_just_pressed = false
 	mouse_motion = Vector2.ZERO
 
-	# Process escape key to toggle mouse capture or pause
-	if Input.is_action_just_pressed("escape"):
-		if GameStateManager.is_playing():
-			toggle_mouse_capture()
-		elif GameStateManager.is_paused():
-			GameStateManager.resume()
+	# Handle pause menu toggle - only when actively playing
+	# (pause menu itself handles escape when already paused)
+	if Input.is_action_just_pressed("escape") and GameStateManager.is_playing():
+		GameStateManager.pause()
 
-	# Only process game input if in playing state
+	# State-aware input processing - only process game input when actually playing
+	# This prevents input from affecting gameplay during menus, pause, etc.
 	if not GameStateManager.can_process_input():
-		# Clear movement input when not playing
+		# Clear any lingering input state to prevent stuck inputs
 		if movement_input != Vector2.ZERO:
 			movement_input = Vector2.ZERO
 			movement_input_changed.emit(movement_input)
@@ -82,13 +95,12 @@ func _unhandled_input(event: InputEvent) -> void:
 	# Only process mouse input if in playing state
 	if not GameStateManager.can_process_input():
 		return
-	
+
 	if event is InputEventMouseMotion and mouse_captured:
 		mouse_motion = event.relative
 		mouse_motion_changed.emit(mouse_motion)
-	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed and not mouse_captured:
-		# Recapture mouse when clicking on screen
-		capture_mouse()
+	# Don't recapture mouse automatically - let individual scenes handle this
+	# The mouse will be recaptured when entering gameplay
 
 # Public methods for other nodes to access input state
 func get_movement_input() -> Vector2:

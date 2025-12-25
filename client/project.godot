@@ -19,7 +19,6 @@ config/icon="res://icon.svg"
 
 InputManager="*res://shared/utils/input_manager.gd"
 GameStateManager="*res://shared/utils/game_state_manager.gd"
-MultiplayerManager="*res://shared/utils/multiplayer_manager.gd"
 NetworkingManager="*res://shared/utils/networking_manager.gd"
 
 [editor]

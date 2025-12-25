@@ -1,0 +1,5 @@
+[gd_scene load_steps=2 format=3 uid="uid://dhundmprcr8es"]
+
+[ext_resource type="PackedScene" uid="uid://b2puwfday3oy0" path="res://assets/maps/zawarldo.glb" id="1_g3536"]
+
+[node name="zawarldo" instance=ExtResource("1_g3536")]

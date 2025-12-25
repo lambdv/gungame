@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://be0mrh4nc0d31"]
 
-[ext_resource type="PackedScene" uid="uid://c8q3k7m2xh4j8" path="res://ui/lobby_list.tscn" id="1_lobby_list"]
+[ext_resource type="PackedScene" uid="uid://c8q3k7m2xh4j8" path="res://ui/menus/lobbies/lobby_list.tscn" id="1_lobby_list"]
 
 [node name="Main" type="Control"]
 layout_mode = 3

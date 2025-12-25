@@ -40,6 +40,12 @@ func get_active_weapon_id() -> int:
 func get_weapon_data(weapon_id: int) -> Dictionary:
 	return weapons_data.get(weapon_id, {})
 
+func get_weapon_id_in_slot(slot: int) -> int:
+	var index = slot - 1
+	if index >= 0 and index < weapon_ids.size():
+		return weapon_ids[index]
+	return -1
+
 func switch_to_weapon(slot: int) -> void:
 	var index = slot - 1
 	if index >= 0 and index < weapon_ids.size():

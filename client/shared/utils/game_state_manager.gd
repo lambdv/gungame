@@ -27,15 +27,14 @@ func set_state(new_state: GameState) -> void:
 	state_changed.emit(new_state)
 	
 	# Emit specific state signals
+	# Note: We don't pause the scene tree for multiplayer - only disable input processing
 	match new_state:
 		GameState.PAUSED:
 			if previous_state == GameState.PLAYING:
 				paused.emit()
-			get_tree().paused = true
 		GameState.PLAYING:
 			if previous_state == GameState.PAUSED:
 				resumed.emit()
-			get_tree().paused = false
 		GameState.SPECTATING:
 			if previous_state != GameState.SPECTATING:
 				spectating_started.emit()

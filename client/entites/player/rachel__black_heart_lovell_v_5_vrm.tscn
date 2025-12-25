@@ -1,8 +1,29 @@
 [gd_scene load_steps=2 format=3 uid="uid://bpi1unhvdh6nj"]
 
-[ext_resource type="PackedScene" uid="uid://biesr31esx1fk" path="res://assets/mobs/Rachel_Lovell__Lovellverse_-510f9c50/fbx/rachel__black_heart_lovell_v5vrm.fbx" id="1_r1ln0"]
+[ext_resource type="PackedScene" uid="uid://b5xgqy2pndapx" path="res://assets/mobs/Rachel_Lovell__Lovellverse_-510f9c50/fbx/rachel__black_heart_lovell_v5vrm.fbx" id="1_r1ln0"]
 
 [node name="rachel__black_heart_lovell_v5vrm" instance=ExtResource("1_r1ln0")]
 
 [node name="Light" parent="." index="1"]
+visible = false
+
+[node name="node_c0c8e0be_140f_4f72_be82_157729a7fcf0_mesh4" parent="node_154fe3da_1de3_44c7_8cfa_b5cc375820e8/node_fc3aba1b_9a55_4285_b046_64a9f5b2c445/node_c0c8e0be_140f_4f72_be82_157729a7fcf0" index="5"]
+visible = false
+
+[node name="node_c0c8e0be_140f_4f72_be82_157729a7fcf0_mesh5" parent="node_154fe3da_1de3_44c7_8cfa_b5cc375820e8/node_fc3aba1b_9a55_4285_b046_64a9f5b2c445/node_c0c8e0be_140f_4f72_be82_157729a7fcf0" index="6"]
+visible = false
+
+[node name="node_c0c8e0be_140f_4f72_be82_157729a7fcf0_mesh6" parent="node_154fe3da_1de3_44c7_8cfa_b5cc375820e8/node_fc3aba1b_9a55_4285_b046_64a9f5b2c445/node_c0c8e0be_140f_4f72_be82_157729a7fcf0" index="7"]
+visible = false
+
+[node name="node_c0c8e0be_140f_4f72_be82_157729a7fcf0_mesh7" parent="node_154fe3da_1de3_44c7_8cfa_b5cc375820e8/node_fc3aba1b_9a55_4285_b046_64a9f5b2c445/node_c0c8e0be_140f_4f72_be82_157729a7fcf0" index="8"]
+visible = false
+
+[node name="node_c0c8e0be_140f_4f72_be82_157729a7fcf0_mesh8" parent="node_154fe3da_1de3_44c7_8cfa_b5cc375820e8/node_fc3aba1b_9a55_4285_b046_64a9f5b2c445/node_c0c8e0be_140f_4f72_be82_157729a7fcf0" index="9"]
+visible = false
+
+[node name="node_c0c8e0be_140f_4f72_be82_157729a7fcf0_mesh9" parent="node_154fe3da_1de3_44c7_8cfa_b5cc375820e8/node_fc3aba1b_9a55_4285_b046_64a9f5b2c445/node_c0c8e0be_140f_4f72_be82_157729a7fcf0" index="10"]
+visible = false
+
+[node name="node_c4c909ae_1658_4cec_925e_84abfd841349" parent="node_154fe3da_1de3_44c7_8cfa_b5cc375820e8/node_fc3aba1b_9a55_4285_b046_64a9f5b2c445" index="3"]
 visible = false

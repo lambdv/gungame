@@ -33,3 +33,4 @@ scripts/
 
 # Assets (keep locally but don't track in git)
 client/assets/
+archive/
