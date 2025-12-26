@@ -86,13 +86,6 @@ func _setup_connection_monitoring() -> void:
 	connection_monitor_timer.timeout.connect(_check_connection_health)
 	add_child(connection_monitor_timer)
 	connection_monitor_timer.start()
-	
-	# Setup keepalive timer to send periodic heartbeat messages
-	var keepalive_timer = Timer.new()
-	keepalive_timer.wait_time = 10.0  # Send keepalive every 10 seconds
-	keepalive_timer.timeout.connect(_send_keepalive)
-	add_child(keepalive_timer)
-	keepalive_timer.start()
 
 func _exit_tree() -> void:
 	if udp_peer:
@@ -335,7 +328,6 @@ func send_position_update(position: Vector3, rotation: Vector3) -> void:
 	var packet = {
 		"type": "position_update",
 		"player_id": player_id,
-		"lobby_code": current_lobby.get("code", ""),
 		"position": {
 			"x": position.x,
 			"y": position.y,
@@ -356,8 +348,8 @@ func send_weapon_switch(weapon_id: int) -> void:
 
 	var packet = {
 		"type": "weapon_switch",
-		"player_id": player_id,
 		"lobby_code": current_lobby.get("code", ""),
+		"player_id": player_id,
 		"weapon_id": weapon_id
 	}
 
@@ -667,18 +659,6 @@ func _check_connection_health() -> void:
 		_set_connection_state(ConnectionState.DISCONNECTED)
 		attempt_reconnection()
 
-## _send_keepalive
-## Sends keepalive heartbeat to prevent being marked inactive during scene loading
-func _send_keepalive() -> void:
-	if connection_state == ConnectionState.CONNECTED_LOBBY and connected_to_udp:
-		if not current_lobby.is_empty() and player_id >= 0:
-			var packet = {
-				"type": "keepalive",
-				"player_id": player_id,
-				"lobby_code": current_lobby.get("code", "")
-			}
-			_send_udp_packet(packet)
-
 ## _on_udp_connection_timeout
 ## Fallback handler when UDP connection fails to establish
 func _on_udp_connection_timeout(lobby_data: Dictionary) -> void:
@@ -692,4 +672,3 @@ func _on_udp_connection_timeout(lobby_data: Dictionary) -> void:
 
 		# Set a degraded connection state
 		_set_connection_state(ConnectionState.CONNECTED_HTTP)
-

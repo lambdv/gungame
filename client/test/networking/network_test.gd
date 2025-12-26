@@ -10,10 +10,8 @@ func _ready() -> void:
 
 func dotest():
 	write("test start")
-	# Note: This test uses NetworkingManager directly now
-	# For testing, you can call NetworkingManager methods
-	write("NetworkingManager available: " + str(NetworkingManager != null))
-	if NetworkingManager:
-		write("test success - NetworkingManager loaded")
+	var res = NetworkingAdaptor.send_http_request("http://127.0.0.1:8080/test", [], HTTPClient.METHOD_GET, "")
+	if res >= 0:
+		write("test success")
 	else:
-		write("test failed - NetworkingManager not found")
+		write("test failed")

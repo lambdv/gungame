@@ -6,7 +6,7 @@ func _enter_tree() -> void:
 	set_process_input(true)
 ##
 ## Test scene that demonstrates the complete multiplayer pipeline:
-## - Connects to test lobby via NetworkingManager
+## - Connects to test lobby via ServerRepository
 ## - Spawns local player with input controls
 ## - Spawns remote players as they join
 ## - Synchronizes positions in real-time
@@ -17,18 +17,16 @@ func _enter_tree() -> void:
 ##
 ## Integration Steps for Game Levels:
 ## 1. Add PLAYER_SCENE and PLAYER_SPAWN_POSITION constants
-## 2. Connect to NetworkingManager signals in _ready(): lobby_joined, player_joined, etc.
+## 2. Connect to ServerCallbacks signals in _ready(): lobby_joined, player_joined, etc.
 ## 3. Implement spawn_local_player() and spawn_remote_player() functions
 ## 4. Add position synchronization in _process() with throttling
 ## 5. Handle player respawning and cleanup in lobby_left signal
-## 6. Use GameStateManager for managing game state
+## 6. Use ClientState for managing player instances and game state
 
 const PLAYER_SCENE_PATH = "res://entites/player/Player.tscn"  # Player prefab path for spawning
 const PLAYER_SPAWN_POSITION = Vector3(0, 1.62212, -2.21878)  # Where local player starts
 
-# Player instance tracking
-@onready var local_player: CharacterBody3D = null  # The player we control
-@onready var remote_players: Dictionary = {}  # Network player_id -> CharacterBody3D instance
+# Player instance tracking (now managed by ClientState)
 @onready var server_dummy: Node3D = null  # Server-controlled bot for testing
 @onready var connection_timer: Timer = null  # Timeout for connection attempts
 @onready var error_label: Label = $ErrorLabel  # UI for connection errors
@@ -47,30 +45,43 @@ func get_player_scene() -> PackedScene:
 ## Initialize the test world and start multiplayer connection
 func _ready() -> void:
 	# Connect to all networking signals to respond to multiplayer events
-	NetworkingManager.lobby_joined.connect(_on_lobby_joined)
-	NetworkingManager.lobby_left.connect(_on_lobby_left)
-	NetworkingManager.lobby_created.connect(_on_lobby_created)
-	NetworkingManager.lobby_join_failed.connect(_on_lobby_join_failed)
-	NetworkingManager.player_joined.connect(_on_player_joined)
-	NetworkingManager.player_left.connect(_on_player_left)
-	NetworkingManager.position_update_received.connect(_on_position_update_received)
-	NetworkingManager.server_dummy_updated.connect(_on_server_dummy_updated)
-	NetworkingManager.connection_confirmed.connect(_on_connection_confirmed)
-	NetworkingManager.state_sync_received.connect(_on_state_sync_received)
+	ServerCallbacks.lobby_joined.connect(_on_lobby_joined)
+	ServerCallbacks.lobby_left.connect(_on_lobby_left)
+	ServerCallbacks.lobby_created.connect(_on_lobby_created)
+	ServerCallbacks.lobby_join_failed.connect(_on_lobby_join_failed)
+	ServerCallbacks.player_joined.connect(_on_player_joined)
+	ServerCallbacks.player_left.connect(_on_player_left)
+	ServerCallbacks.position_update_received.connect(_on_position_update_received)
+	ServerCallbacks.server_dummy_updated.connect(_on_server_dummy_updated)
+	ServerCallbacks.connection_confirmed.connect(_on_connection_confirmed)
+	ServerCallbacks.state_sync_received.connect(_on_state_sync_received)
 
 	# Connect to local player death signal to handle respawning
 	# We'll connect this when the player is spawned
 
 	# Check if we're already connected to a lobby (joined from lobby list)
+	# Use call_deferred to ensure ClientState is available
 	call_deferred("_check_existing_lobby_connection")
 
 func _check_existing_lobby_connection() -> void:
-	if NetworkingManager.is_connected_to_lobby():
+	var server_repo = ServerRepository
+	if server_repo and server_repo.has_method("is_connected_to_lobby") and server_repo.is_connected_to_lobby():
 		print("World: Already connected to lobby, initializing game...")
-		_on_lobby_joined(NetworkingManager.current_lobby)
+		var current_lobby = ClientState.get_current_lobby()
+		if not current_lobby.is_empty():
+			_on_lobby_joined(current_lobby)
+		else:
+			# Fallback: get lobby from server repository
+			var repo_lobby = {}
+			if "current_lobby" in server_repo:
+				repo_lobby = server_repo.current_lobby
+			if not repo_lobby.is_empty():
+				_on_lobby_joined(repo_lobby)
+			else:
+				push_warning("World: Connected to lobby but no lobby data available")
 		# Don't start connection timer since we're already connected
 		return
-	elif NetworkingManager.connection_state == NetworkingManager.ConnectionState.CONNECTED_LOBBY:
+	elif server_repo and server_repo.connection_state == ServerCallbacks.ConnectionState.CONNECTED_LOBBY:
 		print("World: In lobby but UDP not confirmed yet, waiting for confirmation...")
 		# Start timer but with shorter timeout since we should be close to connected
 		connection_timer = Timer.new()
@@ -82,7 +93,8 @@ func _check_existing_lobby_connection() -> void:
 	else:
 		# Start the multiplayer connection process for testing
 		print("World: Not connected to lobby, connecting to test lobby...")
-		NetworkingManager.connect_to_test_lobby()
+		if server_repo and server_repo.has_method("connect_to_test_lobby"):
+			server_repo.connect_to_test_lobby()
 
 		# Set up connection timeout timer
 		connection_timer = Timer.new()
@@ -95,7 +107,7 @@ func _check_existing_lobby_connection() -> void:
 func _on_lobby_created(lobby_data: Dictionary) -> void:
 	print("World: Lobby created, now joining it...")
 	# After creating a lobby, join it
-	NetworkingManager.join_lobby(lobby_data.get("code", "TEST"))
+	ServerRepository.join_lobby(lobby_data.get("code", "TEST"))
 
 func _on_lobby_joined(lobby_data: Dictionary) -> void:
 	print("=== WORLD RECEIVED LOBBY_JOINED SIGNAL ===")
@@ -107,9 +119,9 @@ func _on_lobby_joined(lobby_data: Dictionary) -> void:
 		connection_timer.stop()
 
 	# Ensure game state is PLAYING before spawning player
-	if GameStateManager:
-		GameStateManager.set_state(GameStateManager.GameState.PLAYING)
-		print("World: Game state set to PLAYING, can_process_input: ", GameStateManager.can_process_input())
+	if ClientState:
+		ClientState.set_game_state(ClientState.GameState.PLAYING)
+		print("World: Game state set to PLAYING, can_process_input: ", ClientState.can_process_input())
 
 	# Capture mouse for gameplay
 	InputManager.capture_mouse()
@@ -123,7 +135,7 @@ func _on_lobby_joined(lobby_data: Dictionary) -> void:
 	# Spawn existing remote players (excluding ourselves)
 	for player_data in lobby_data.get("players", []):
 		var player_id = player_data.get("id", -1)
-		if player_id != NetworkingManager.player_id:
+		if player_id != ClientState.get_player_id():
 			spawn_remote_player(player_id, player_data)
 
 	print("World: Scene loading complete!")
@@ -131,17 +143,18 @@ func _on_lobby_joined(lobby_data: Dictionary) -> void:
 func _on_lobby_left() -> void:
 	print("World: Lobby left - cleaning up game objects")
 
-	# Clean up local player
-	if local_player and is_instance_valid(local_player):
-		local_player.queue_free()
-		local_player = null
+	# Clean up players through ClientState
+	var main_player = ClientState.get_main_player()
+	if main_player and is_instance_valid(main_player):
+		main_player.queue_free()
+		ClientState.set_main_player(null)
 
-	# Clean up remote players
-	for player_id in remote_players.keys():
-		var player_instance = remote_players[player_id]
+	var other_players = ClientState.get_all_other_players()
+	for player_id in other_players.keys():
+		var player_instance = other_players[player_id]
 		if is_instance_valid(player_instance):
 			player_instance.queue_free()
-	remote_players.clear()
+		ClientState.remove_other_player(player_id)
 
 	# Clean up server dummy
 	cleanup_server_dummy()
@@ -163,7 +176,7 @@ func _on_lobby_join_failed(error: String) -> void:
 
 func _on_player_joined(player_data: Dictionary) -> void:
 	var player_id = player_data.get("id", -1)
-	if player_id == NetworkingManager.player_id:
+	if player_id == ClientState.get_player_id():
 		# This is us, already spawned
 		return
 
@@ -172,25 +185,22 @@ func _on_player_joined(player_data: Dictionary) -> void:
 
 func _on_player_left(player_id: int) -> void:
 	print("Remote player left: ", player_id)
-	if player_id in remote_players:
-		var player_instance = remote_players[player_id]
-		remote_players.erase(player_id)
-		if is_instance_valid(player_instance):
-			player_instance.queue_free()
+	var player_instance = ClientState.get_other_player(player_id)
+	if player_instance and is_instance_valid(player_instance):
+		player_instance.queue_free()
+	ClientState.remove_other_player(player_id)
 
 func _on_position_update_received(player_id: int, position: Vector3, rotation: Vector3) -> void:
 	# Don't update our own position (we control it locally)
-	if player_id == NetworkingManager.player_id:
+	if player_id == ClientState.get_player_id():
 		return
 
 	# If player doesn't exist yet, spawn them
-	if player_id not in remote_players:
+	if not ClientState.get_other_player(player_id):
 		spawn_remote_player(player_id, {"id": player_id, "name": "Player" + str(player_id)})
 
-	if player_id in remote_players:
-		var player_instance = remote_players[player_id]
-		if is_instance_valid(player_instance):
-			pass
+	var player_instance = ClientState.get_other_player(player_id)
+	if player_instance and is_instance_valid(player_instance):
 		# Use smooth interpolation instead of direct position setting
 		# rotation data: (body_y_rotation, head_x_rotation, roll)
 		if player_instance.has_method("update_target_position"):
@@ -209,20 +219,20 @@ func _on_state_sync_received(player_states: Array) -> void:
 		var player_id = state_data.get("id", -1)
 
 		# Apply state sync to local player for server-authoritative data (weapon, ammo, health)
-		if player_id == NetworkingManager.player_id:
-			if local_player and is_instance_valid(local_player) and local_player.has_method("apply_state_sync"):
-				local_player.apply_state_sync(state_data)
+		if player_id == ClientState.get_player_id():
+			var main_player = ClientState.get_main_player()
+			if main_player and is_instance_valid(main_player) and main_player.has_method("apply_state_sync"):
+				main_player.apply_state_sync(state_data)
 			continue
 
 		# Ensure remote player exists
-		if player_id not in remote_players:
+		if not ClientState.get_other_player(player_id):
 			spawn_remote_player(player_id, {"id": player_id, "name": "Player" + str(player_id)})
 
 		# Apply state sync to the player
-		if player_id in remote_players:
-			var player_instance = remote_players[player_id]
-			if is_instance_valid(player_instance) and player_instance.has_method("apply_state_sync"):
-				player_instance.apply_state_sync(state_data)
+		var player_instance = ClientState.get_other_player(player_id)
+		if player_instance and is_instance_valid(player_instance) and player_instance.has_method("apply_state_sync"):
+			player_instance.apply_state_sync(state_data)
 
 func cleanup_server_dummy() -> void:
 	if server_dummy and is_instance_valid(server_dummy):
@@ -231,7 +241,8 @@ func cleanup_server_dummy() -> void:
 
 func spawn_local_player() -> void:
 	# Don't spawn if we already have a local player
-	if local_player and is_instance_valid(local_player):
+	var existing_player = ClientState.get_main_player()
+	if existing_player and is_instance_valid(existing_player):
 		print("World: Local player already exists, skipping spawn")
 		return
 
@@ -252,14 +263,18 @@ func spawn_local_player() -> void:
 	if player_instance.has_method("set_is_local"):
 		player_instance.set_is_local(true)
 
-	# Connect to networking manager for multiplayer commands
+	# Connect to networking repository for multiplayer commands
 	if player_instance.has_method("set_networking_manager"):
-		player_instance.set_networking_manager(NetworkingManager)
+		player_instance.set_networking_manager(ClientState.get_server_repository())
 	if player_instance.has_method("set_player_id"):
-		player_instance.set_player_id(NetworkingManager.player_id)
+		player_instance.set_player_id(ClientState.get_player_id())
 
 	add_child(player_instance)
-	local_player = player_instance
+	ClientState.set_main_player(player_instance)
+	
+	# Ensure game state is PLAYING so input works
+	if ClientState:
+		ClientState.set_game_state(ClientState.GameState.PLAYING)
 
 	# Connect to player death signal for respawning
 	if player_instance.has_signal("died"):
@@ -274,10 +289,10 @@ func spawn_local_player() -> void:
 
 	print("World: Local player spawned successfully")
 
-	# Local player setup complete - NetworkingManager handles multiplayer coordination
+	# Local player setup complete - ClientState manages player state
 
 func spawn_remote_player(player_id: int, player_data: Dictionary) -> void:
-	if player_id in remote_players:
+	if ClientState.get_other_player(player_id):
 		return
 
 	var player_scene = get_player_scene()
@@ -303,13 +318,13 @@ func spawn_remote_player(player_id: int, player_data: Dictionary) -> void:
 	if player_instance.has_method("update_target_position"):
 		player_instance.update_target_position(spawn_pos, Vector3.ZERO)
 
-	# Connect to networking manager for state synchronization
+	# Connect to networking repository for state synchronization
 	if player_instance.has_method("set_networking_manager"):
-		player_instance.set_networking_manager(NetworkingManager)
+		player_instance.set_networking_manager(ClientState.get_server_repository())
 	if player_instance.has_method("set_player_id"):
 		player_instance.set_player_id(player_id)
 
-	remote_players[player_id] = player_instance
+	ClientState.add_other_player(player_id, player_instance)
 
 func spawn_server_dummy() -> void:
 	server_dummy = Node3D.new()
@@ -344,32 +359,35 @@ func _on_local_player_died(attacker: Node) -> void:
 		error_label.text = "You died! Press R to respawn or leave the game."
 
 	# Disconnect from death signal to prevent multiple connections
-	if local_player and local_player.has_signal("died"):
-		local_player.died.disconnect(_on_local_player_died)
+	var main_player = ClientState.get_main_player()
+	if main_player and main_player.has_signal("died"):
+		main_player.died.disconnect(_on_local_player_died)
 
 func _input(event: InputEvent) -> void:
 	# Handle respawn input
-	if event.is_action_pressed("reload") and local_player and local_player.has_node("Damageable"):
-		var damageable = local_player.get_node("Damageable")
+	var main_player = ClientState.get_main_player()
+	if event.is_action_pressed("reload") and main_player and main_player.has_node("Damageable"):
+		var damageable = main_player.get_node("Damageable")
 		if damageable and not damageable.is_alive():
 			print("World: Respawning player...")
 			respawn_local_player()
 
 func respawn_local_player() -> void:
-	if not local_player:
+	var main_player = ClientState.get_main_player()
+	if not main_player:
 		spawn_local_player()
 		return
 
 	# Reset player health and position
-	local_player.position = PLAYER_SPAWN_POSITION
-	if local_player.has_node("Damageable"):
-		var damageable = local_player.get_node("Damageable")
+	main_player.position = PLAYER_SPAWN_POSITION
+	if main_player.has_node("Damageable"):
+		var damageable = main_player.get_node("Damageable")
 		if damageable.has_method("heal"):
 			damageable.heal(999)  # Full heal
 
 	# Reconnect death signal
-	if local_player.has_signal("died"):
-		local_player.died.connect(_on_local_player_died)
+	if main_player.has_signal("died"):
+		main_player.died.connect(_on_local_player_died)
 
 	# Hide error message
 	if error_label:
@@ -397,7 +415,8 @@ const POSITION_UPDATE_INTERVAL: float = 0.2  # 5 updates per second
 ## @param delta: Time elapsed since last frame
 func _process(delta: float) -> void:
 	# Only send position updates if we have a local player and are connected
-	if local_player and NetworkingManager.is_connected_to_lobby():
+	var main_player = ClientState.get_main_player()
+	if main_player and ClientState.is_in_lobby():
 		position_update_timer += delta
 
 		# Throttle updates to prevent network spam while maintaining responsiveness
@@ -405,11 +424,13 @@ func _process(delta: float) -> void:
 			position_update_timer = 0.0
 
 			# Send current position and rotation to server for broadcasting
-			var pos = local_player.position
+			var pos = main_player.position
 			# Send rotation as (horizontal_body, vertical_head, roll) for clarity
 			var rot = Vector3(
-				local_player.rotation.y,  # Horizontal body rotation (Y-axis)
-				local_player.get_node("CameraRig/Head").rotation.x,  # Vertical head rotation (X-axis)
+				main_player.rotation.y,  # Horizontal body rotation (Y-axis)
+				main_player.get_node("CameraRig/Head").rotation.x,  # Vertical head rotation (X-axis)
 				0.0  # No roll
 			)
-			NetworkingManager.send_position_update(pos, rot)
+			var server_repo = ClientState.get_server_repository()
+			if server_repo and server_repo.has_method("send_position_update"):
+				server_repo.send_position_update(pos, rot)

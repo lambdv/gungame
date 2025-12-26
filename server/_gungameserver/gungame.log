@@ -1,0 +1,14 @@
+[2025-12-23][20:26:29][gungameserver::server][INFO] Starting HTTP server on 0.0.0.0:8080
+[2025-12-23][20:26:29][gungameserver::server][INFO] HTTP server successfully bound to 0.0.0.0:8080
+[2025-12-23][20:30:14][gungameserver::server][INFO] Starting HTTP server on 0.0.0.0:8080
+[2025-12-23][20:30:14][gungameserver::server][INFO] Starting UDP server on 0.0.0.0:8081
+[2025-12-23][20:30:14][gungameserver::server][INFO] UDP server successfully bound to 0.0.0.0:8081
+[2025-12-23][20:30:14][gungameserver::server][INFO] HTTP server successfully bound to 0.0.0.0:8080
+[2025-12-24][01:50:23][gungameserver::server][INFO] Starting HTTP server on 0.0.0.0:8080
+[2025-12-24][01:50:23][gungameserver::server][INFO] Starting UDP server on 0.0.0.0:8081
+[2025-12-24][01:50:23][gungameserver::server][INFO] UDP server successfully bound to 0.0.0.0:8081
+[2025-12-24][01:50:23][gungameserver::server][INFO] HTTP server successfully bound to 0.0.0.0:8080
+[2025-12-24][02:33:57][gungameserver::server][INFO] Starting HTTP server on 0.0.0.0:8080
+[2025-12-24][02:33:57][gungameserver::server][INFO] Starting UDP server on 0.0.0.0:8081
+[2025-12-24][02:33:57][gungameserver::server][INFO] UDP server successfully bound to 0.0.0.0:8081
+[2025-12-24][02:33:57][gungameserver::server][INFO] HTTP server successfully bound to 0.0.0.0:8080

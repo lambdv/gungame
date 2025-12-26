@@ -61,7 +61,7 @@ var health_bar_3d: Node3D = null  # Floating 3D health bar above player
 var current_weapon_instance: Node3D = null  # Currently equipped weapon scene instance
 var hand_item_base_position: Vector3  # Original weapon position for sway animations
 var was_on_floor: bool = true  # Previous frame's ground state for jump animations
-var networking_manager: Node = null  # Reference to ServerRepository for multiplayer sync
+var networking_manager: Node = null  # Reference to networking manager for multiplayer sync
 var pending_weapon_switch_id: int = -1  # Track weapon switch we initiated to avoid applying it from state sync
 # Attack cooldown removed - now handled by weapon fire rate
 
@@ -79,7 +79,7 @@ func _ready() -> void:
 	damageable.died.connect(_on_player_died)
 
 	# Initialize floating 3D health bar - only visible on remote players
-	health_bar_3d = preload("res://ui/overlays/health_bar/health_bar_3d.gd").new()
+	health_bar_3d = preload("res://ui/health_bar_3d.gd").new()
 	add_child(health_bar_3d)
 	health_bar_3d.set_target(self)  # Tell health bar to follow this player
 	health_bar_3d.set_health(damageable.current_health, damageable.max_health)
@@ -106,15 +106,6 @@ func _ready() -> void:
 	var weapon_id = inventory.get_active_weapon_id()
 	if weapon_id > 0:
 		load_weapon(weapon_id)
-
-	
-func _process(delta: float) -> void:
-	if is_local:
-		var position = global_position
-		var look_vector = camera.project_ray_normal(Vector2(0, 0))
-		print("Position: ", position)
-		print("Look vector: ", look_vector)
-
 
 func set_is_local(value: bool) -> void:
 	var was_local = is_local
@@ -260,11 +251,6 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 	was_on_floor = is_on_floor()
-	
-	# Update player state in ClientState based on movement
-	if ClientState:
-		var is_crouching = false  # TODO: Add crouch detection when crouch is implemented
-		ClientState.update_player_state_from_movement(player_id, is_local, velocity, is_on_floor(), is_crouching)
 
 func jump() -> void:
 	velocity.y = JUMP_VELOCITY
@@ -344,13 +330,6 @@ func _on_player_died(attacker: Node) -> void:
 	else:
 		attacker_name = "unknown"
 	print("Player died! Killed by: ", attacker_name)
-	
-	# Update player state in ClientState
-	if ClientState:
-		if is_local:
-			ClientState.set_main_player_state(ClientState.PlayerState.DEAD)
-		else:
-			ClientState.set_other_player_state(player_id, ClientState.PlayerState.DEAD)
 
 	# Sync death across network
 	if multiplayer.is_server():
@@ -364,9 +343,6 @@ func _on_player_died(attacker: Node) -> void:
 	if current_scene and not current_scene.scene_file_path.contains("test"):
 		await get_tree().create_timer(3.0).timeout
 		damageable.current_health = damageable.max_health
-		# Update state back to alive after respawn
-		if ClientState and is_local:
-			ClientState.set_main_player_state(ClientState.PlayerState.IDLE)
 	else:
 		print("Player died in test scene - no auto-respawn")
 
@@ -499,15 +475,14 @@ func set_weapon_visibility(node: Node, should_be_visible: bool) -> void:
 		set_weapon_visibility(child, should_be_visible)
 
 ## set_networking_manager
-## Sets reference to networking repository for multiplayer synchronization
-## @param manager: The ServerRepository instance
+## Sets reference to networking manager for multiplayer synchronization
+## @param manager: The NetworkingManager instance
 func set_networking_manager(manager: Node) -> void:
 	networking_manager = manager
-	# Connect to signals from ServerCallbacks
-	if ServerCallbacks and ServerCallbacks.has_signal("weapon_switched"):
-		ServerCallbacks.weapon_switched.connect(_on_remote_weapon_switched)
-	if ServerCallbacks and ServerCallbacks.has_signal("player_damaged"):
-		ServerCallbacks.player_damaged.connect(_on_network_damage_received)
+	if networking_manager and networking_manager.has_signal("weapon_switched"):
+		networking_manager.weapon_switched.connect(_on_remote_weapon_switched)
+	if networking_manager and networking_manager.has_signal("player_damaged"):
+		networking_manager.player_damaged.connect(_on_network_damage_received)
 
 ## _on_remote_weapon_switched
 ## Handles weapon switch events for remote players (not local player)
@@ -592,11 +567,14 @@ func interpolate_to_target(delta: float) -> void:
 	#	print("Interpolating player ", player_id, " from ", old_pos, " to ", target_position, " (current: ", global_position, ")")
 
 	# Interpolate rotation (horizontal rotation - body turning)
-	# Use lerp_angle to automatically handle shortest path around circle
+	var current_y_rotation = rotation.y
 	var target_y_rotation = -target_rotation.x  # Body rotation is in x component, inverted for correct direction
-	rotation.y = lerp_angle(rotation.y, target_y_rotation, interpolation_speed * delta)
+	var angle_diff = fmod(target_y_rotation - current_y_rotation + PI, TAU) - PI
+	rotation.y = current_y_rotation + angle_diff * interpolation_speed * delta
 
 	# For vertical rotation (head/camera), interpolate smoothly
 	if character_model:
+		var current_head_rotation = character_model.rotation.x
 		var target_head_rotation = target_rotation.y  # Head rotation is in y component, correct direction
-		character_model.rotation.x = lerp_angle(character_model.rotation.x, target_head_rotation, interpolation_speed * delta)
+		var head_angle_diff = fmod(target_head_rotation - current_head_rotation + PI, TAU) - PI
+		character_model.rotation.x = current_head_rotation + head_angle_diff * interpolation_speed * delta

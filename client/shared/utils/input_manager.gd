@@ -43,12 +43,12 @@ func _physics_process(_delta: float) -> void:
 
 	# Handle pause menu toggle - only when actively playing
 	# (pause menu itself handles escape when already paused)
-	if Input.is_action_just_pressed("escape") and GameStateManager.is_playing():
-		GameStateManager.pause()
+	if Input.is_action_just_pressed("escape") and ClientState.is_playing():
+		ClientState.pause()
 
 	# State-aware input processing - only process game input when actually playing
 	# This prevents input from affecting gameplay during menus, pause, etc.
-	if not GameStateManager.can_process_input():
+	if not ClientState.can_process_input():
 		# Clear any lingering input state to prevent stuck inputs
 		if movement_input != Vector2.ZERO:
 			movement_input = Vector2.ZERO
@@ -93,7 +93,7 @@ func _physics_process(_delta: float) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	# Only process mouse input if in playing state
-	if not GameStateManager.can_process_input():
+	if not ClientState.can_process_input():
 		return
 
 	if event is InputEventMouseMotion and mouse_captured:

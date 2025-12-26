@@ -12,13 +12,13 @@ func _ready() -> void:
 	visible = false
 
 	# Connect to game state changes
-	if ClientState:
-		ClientState.game_paused.connect(_on_game_paused)
-		ClientState.game_resumed.connect(_on_game_resumed)
+	if GameStateManager:
+		GameStateManager.paused.connect(_on_game_paused)
+		GameStateManager.resumed.connect(_on_game_resumed)
 
 func _on_resume_pressed() -> void:
-	if ClientState:
-		ClientState.resume()
+	if GameStateManager:
+		GameStateManager.resume()
 
 func _on_leave_pressed() -> void:
 	# Gracefully leave the game
@@ -38,8 +38,12 @@ func _on_game_resumed() -> void:
 
 func _leave_game() -> void:
 	# Leave current lobby but keep HTTP connection alive for lobby browser
-	if ServerRepository:
-		ServerRepository.return_to_lobby_browser()
+	if NetworkingManager:
+		NetworkingManager.return_to_lobby_browser()
+
+	# Disconnect from multiplayer
+	if MultiplayerManager and MultiplayerManager.is_connected:
+		MultiplayerManager.disconnect_from_server()
 
 	# Change to lobby list scene instead of main menu
-	get_tree().change_scene_to_file("res://ui/menus/lobbies/lobby_list.tscn")
+	get_tree().change_scene_to_file("res://lobbies/lobby_list.tscn")
