@@ -203,7 +203,7 @@ func _on_position_update_received(player_id: int, position: Vector3, rotation: V
 	if player_instance and is_instance_valid(player_instance):
 		# Use smooth interpolation instead of direct position setting
 		# rotation data: (body_y_rotation, head_x_rotation, roll)
-		print("DEBUG: Received position update for player ", player_id, ": pos=", position, " rot=", rotation)
+		# print("DEBUG: Received position update for player ", player_id, ": pos=", position, " rot=", rotation)
 		if player_instance.has_method("update_target_position"):
 			player_instance.update_target_position(position, Vector3(rotation.x, rotation.y, 0.0))
 		else:

@@ -15,6 +15,14 @@ pub enum LobbyCommand {
         player_id: u32,
     },
     
+    // UDP-specific player connection (for clients connecting via UDP after HTTP join)
+    // This acts like PlayerJoin but for players who already exist in the lobby
+    UdpConnect {
+        player_id: u32,
+        name: String,
+        addr: SocketAddr,
+    },
+    
     // Position (only latest kept per player)
     PositionUpdate {
         player_id: u32,

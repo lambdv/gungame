@@ -1,7 +1,7 @@
-use std::collections::HashMap;
-use std::time::SystemTime;
-use std::net::SocketAddr;
 use crate::utils::buffers::SmallPlayerVec;
+use std::collections::HashMap;
+use std::net::SocketAddr;
+use std::time::SystemTime;
 
 pub type LobbyCode = String;
 
@@ -29,6 +29,19 @@ pub struct Player {
 
     // Combat timing
     pub last_shot_time: SystemTime,
+
+    // Kill tracking
+    pub kills: u32,
+    pub deaths: u32,
+    pub score: u32,
+    pub killstreak: u32,
+
+    // Inactivity warning state
+    pub warned_at: Option<SystemTime>,
+
+    // Respawn state
+    pub is_dead: bool,
+    pub respawn_time: Option<SystemTime>,
 }
 
 /// Player sync state for delta tracking
@@ -55,6 +68,31 @@ impl Player {
             is_reloading: self.is_reloading,
         }
     }
+
+    pub fn new_player(id: u32, name: String, current_weapon_id: u32, ammo: u32) -> Self {
+        Player {
+            id,
+            name,
+            position: (0.0, 1.0, 0.0),
+            rotation: (0.0, 0.0, 0.0),
+            last_update: SystemTime::now(),
+            current_health: 100,
+            max_health: 100,
+            current_weapon_id,
+            current_ammo: ammo,
+            max_ammo: ammo,
+            is_reloading: false,
+            reload_end_time: None,
+            last_shot_time: SystemTime::UNIX_EPOCH,
+            kills: 0,
+            deaths: 0,
+            score: 0,
+            killstreak: 0,
+            warned_at: None,
+            is_dead: false,
+            respawn_time: None,
+        }
+    }
 }
 
 /// Lobby state - per-lobby partitioned state
@@ -65,9 +103,9 @@ pub struct Lobby {
     pub client_addresses: HashMap<u32, SocketAddr>,
     pub max_players: u32,
     pub scene: String,
-    
+
     // Delta tracking for efficient state sync
-    pub dirty_players: SmallPlayerVec,  // Players with state changes
+    pub dirty_players: SmallPlayerVec, // Players with state changes
     pub last_sync_state: HashMap<u32, PlayerSyncState>,
 }
 
@@ -82,6 +120,10 @@ impl Lobby {
             dirty_players: SmallPlayerVec::new(),
             last_sync_state: HashMap::new(),
         }
+    }
+
+    pub fn new_player(id: u32, name: String, current_weapon_id: u32, ammo: u32) -> Player {
+        Player::new_player(id, name, current_weapon_id, ammo)
     }
 
     /// Mark a player as dirty (state changed)
@@ -124,7 +166,14 @@ mod tests {
             max_ammo: 20,
             is_reloading: false,
             reload_end_time: None,
-            last_shot_time: SystemTime::now(),
+            last_shot_time: SystemTime::UNIX_EPOCH,
+            kills: 0,
+            deaths: 0,
+            score: 0,
+            killstreak: 0,
+            warned_at: None,
+            is_dead: false,
+            respawn_time: None,
         };
 
         let sync = player.to_sync_state();
@@ -141,13 +190,12 @@ mod tests {
         assert_eq!(lobby.dirty_players.len(), 2);
         assert!(lobby.dirty_players.contains(&1));
         assert!(lobby.dirty_players.contains(&2));
-        
+
         // Duplicate should not add again
         lobby.mark_dirty(1);
         assert_eq!(lobby.dirty_players.len(), 2);
-        
+
         lobby.clear_dirty();
         assert_eq!(lobby.dirty_players.len(), 0);
     }
 }
-

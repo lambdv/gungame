@@ -101,6 +101,19 @@ impl ServerState {
 
                 // Combat timing
                 last_shot_time: SystemTime::now(),
+
+                // Kill tracking
+                kills: 0,
+                deaths: 0,
+                score: 0,
+                killstreak: 0,
+
+                // Inactivity warning state
+                warned_at: None,
+
+                // Respawn state
+                is_dead: false,
+                respawn_time: None,
             }),
             client_addresses: HashMap::new(),
             scene: scene,
@@ -154,6 +167,19 @@ impl ServerState {
 
             // Combat timing
             last_shot_time: SystemTime::now(),
+
+            // Kill tracking
+            kills: 0,
+            deaths: 0,
+            score: 0,
+            killstreak: 0,
+
+            // Inactivity warning state
+            warned_at: None,
+
+            // Respawn state
+            is_dead: false,
+            respawn_time: None,
         };
 
         lobby.players.insert(player_id, player);

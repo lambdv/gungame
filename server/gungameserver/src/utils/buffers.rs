@@ -7,12 +7,58 @@ pub type SmallEventVec = SmallVec<[SyncEvent; 16]>;
 /// Sync event for delta-based state updates
 #[derive(Debug, Clone)]
 pub enum SyncEvent {
-    HealthChanged { player_id: u32, health: u32 },
-    AmmoChanged { player_id: u32, ammo: u32 },
-    MaxAmmoChanged { player_id: u32, max_ammo: u32 },
-    WeaponChanged { player_id: u32, weapon_id: u32 },
-    ReloadStateChanged { player_id: u32, is_reloading: bool },
-    PositionChanged { player_id: u32, position: (f32, f32, f32), rotation: (f32, f32, f32) },
+    HealthChanged {
+        player_id: u32,
+        health: u32,
+    },
+    AmmoChanged {
+        player_id: u32,
+        ammo: u32,
+    },
+    MaxAmmoChanged {
+        player_id: u32,
+        max_ammo: u32,
+    },
+    WeaponChanged {
+        player_id: u32,
+        weapon_id: u32,
+    },
+    ReloadStateChanged {
+        player_id: u32,
+        is_reloading: bool,
+    },
+    PositionChanged {
+        player_id: u32,
+        position: (f32, f32, f32),
+        rotation: (f32, f32, f32),
+    },
+    PlayerKilled {
+        killer_id: u32,
+        killer_name: String,
+        victim_id: u32,
+        victim_name: String,
+        weapon_id: u32,
+        weapon_name: String,
+        killer_killstreak: u32,
+    },
+    PlayerRespawned {
+        player_id: u32,
+    },
+    ScoreChanged {
+        player_id: u32,
+        score: u32,
+        kills: u32,
+        deaths: u32,
+        killstreak: u32,
+    },
+    PlayerKicked {
+        player_id: u32,
+        reason: String,
+    },
+    InactivityWarning {
+        player_id: u32,
+        seconds_remaining: u64,
+    },
 }
 
 /// Pre-allocated buffer for packet serialization
@@ -65,4 +111,3 @@ mod tests {
         assert_eq!(buf.as_mut_slice().len(), 0);
     }
 }
-

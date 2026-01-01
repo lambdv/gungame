@@ -546,7 +546,7 @@ func _on_network_damage_received(damaged_player_id: int, damage_amount: int, att
 ## @param new_position: Server-authoritative position
 ## @param new_rotation: Server-authoritative rotation
 func update_target_position(new_position: Vector3, new_rotation: Vector3) -> void:
-	print("DEBUG: update_target_position called for player ", player_id, " is_local=", is_local, " pos=", new_position, " rot=", new_rotation)
+	# print("DEBUG: update_target_position called for player ", player_id, " is_local=", is_local, " pos=", new_position, " rot=", new_rotation)
 	if is_local:
 		# For local players, check if server position differs significantly from local position
 		var position_difference = global_position.distance_to(new_position)
@@ -556,18 +556,17 @@ func update_target_position(new_position: Vector3, new_rotation: Vector3) -> voi
 			target_rotation = new_rotation
 			needs_reconciliation = true
 		# Always update rotation for local player (look direction should be authoritative)
-		# new_rotation: (body_y_rotation, head_x_rotation, roll)
-		rotation.y = -new_rotation.x  # Body rotation (horizontal turning) - inverted for correct direction
+		rotation.y = new_rotation.x  # Body rotation (horizontal turning)
 		if character_model:
-			character_model.rotation.x = new_rotation.y  # Head rotation (vertical looking) - correct direction
+			character_model.rotation.x = new_rotation.y  # Head rotation (vertical looking)
 	else:
 		# For remote players, interpolate towards server position
 		if not has_received_position:
 			# First position update - snap to position
 			global_position = new_position
-			rotation.y = -new_rotation.x  # Body rotation (horizontal turning) - inverted for correct direction
+			rotation.y = new_rotation.x  # Body rotation (horizontal turning)
 			if character_model:
-				character_model.rotation.x = new_rotation.y  # Head rotation (vertical looking) - correct direction
+				character_model.rotation.x = new_rotation.y  # Head rotation (vertical looking)
 			has_received_position = true
 		else:
 			# Subsequent updates - set interpolation target
@@ -575,7 +574,7 @@ func update_target_position(new_position: Vector3, new_rotation: Vector3) -> voi
 			
 			# Always update rotation for remote players (server-authoritative)
 			target_rotation = new_rotation
-			rotation.y = -new_rotation.x  # Apply rotation immediately
+			rotation.y = new_rotation.x  # Apply rotation immediately
 			if character_model:
 				character_model.rotation.x = new_rotation.y
 
@@ -599,10 +598,10 @@ func interpolate_to_target(delta: float) -> void:
 
 	# Interpolate rotation (horizontal rotation - body turning)
 	# Use lerp_angle to automatically handle shortest path around circle
-	var target_y_rotation = -target_rotation.x  # Body rotation is in x component, inverted for correct direction
+	var target_y_rotation = target_rotation.x  # Body rotation is in x component
 	rotation.y = lerp_angle(rotation.y, target_y_rotation, interpolation_speed * delta)
-
+	
 	# For vertical rotation (head/camera), interpolate smoothly
 	if character_model:
-		var target_head_rotation = target_rotation.y  # Head rotation is in y component, correct direction
+		var target_head_rotation = target_rotation.y  # Head rotation is in y component
 		character_model.rotation.x = lerp_angle(character_model.rotation.x, target_head_rotation, interpolation_speed * delta)

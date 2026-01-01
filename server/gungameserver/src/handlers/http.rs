@@ -158,6 +158,131 @@ pub async fn list_lobbies(
     Json(lobbies_info)
 }
 
+#[derive(serde::Serialize)]
+pub struct LeaderboardEntry {
+    pub player_id: u32,
+    pub name: String,
+    pub score: u32,
+    pub kills: u32,
+    pub deaths: u32,
+    pub killstreak: u32,
+}
+
+#[derive(serde::Serialize)]
+pub struct LeaderboardResponse {
+    pub lobby_code: String,
+    pub entries: Vec<LeaderboardEntry>,
+}
+
+/// Thin HTTP handler: Get lobby leaderboard
+pub async fn get_lobby_leaderboard(
+    State(app_state): State<AppState>,
+    Path(code): Path<String>,
+) -> Result<Json<LeaderboardResponse>, StatusCode> {
+    let lobby_arc = app_state.state.get_lobby(&code)
+        .ok_or(StatusCode::NOT_FOUND)?;
+
+    let lobby = lobby_arc.read().await;
+
+    let mut entries: Vec<LeaderboardEntry> = lobby.players.values()
+        .filter(|p| p.id != 999) // Exclude dummy bot
+        .map(|p| LeaderboardEntry {
+            player_id: p.id,
+            name: p.name.clone(),
+            score: p.score,
+            kills: p.kills,
+            deaths: p.deaths,
+            killstreak: p.killstreak,
+        })
+        .collect();
+
+    entries.sort_by(|a, b| b.score.cmp(&a.score));
+
+    Ok(Json(LeaderboardResponse {
+        lobby_code: code,
+        entries,
+    }))
+}
+
+#[derive(serde::Serialize)]
+pub struct PlayerStats {
+    pub player_id: u32,
+    pub name: String,
+    pub total_kills: u32,
+    pub total_deaths: u32,
+    pub total_score: u32,
+    pub kdratio: f32,
+}
+
+/// Thin HTTP handler: Get player stats
+pub async fn get_player_stats(
+    State(app_state): State<AppState>,
+    Path((_code, player_id)): Path<(String, u32)>,
+) -> Result<Json<PlayerStats>, StatusCode> {
+    let lobby_arc = app_state.state.get_lobby(&_code)
+        .ok_or(StatusCode::NOT_FOUND)?;
+
+    let lobby = lobby_arc.read().await;
+
+    let player = lobby.players.get(&player_id)
+        .ok_or(StatusCode::NOT_FOUND)?;
+
+    let kdratio = if player.deaths > 0 {
+        player.kills as f32 / player.deaths as f32
+    } else {
+        player.kills as f32
+    };
+
+    Ok(Json(PlayerStats {
+        player_id: player.id,
+        name: player.name.clone(),
+        total_kills: player.kills,
+        total_deaths: player.deaths,
+        total_score: player.score,
+        kdratio,
+    }))
+}
+
+#[derive(serde::Serialize)]
+pub struct GlobalLeaderboardEntry {
+    pub player_id: u32,
+    pub name: String,
+    pub total_kills: u32,
+    pub total_deaths: u32,
+    pub total_score: u32,
+    pub games_played: u32,
+    pub kdratio: f32,
+}
+
+/// Thin HTTP handler: Get global leaderboard (across all sessions)
+pub async fn get_global_leaderboard(
+    State(app_state): State<AppState>,
+) -> Json<Vec<GlobalLeaderboardEntry>> {
+    let top_players = app_state.state.global_stats.get_top_players(20);
+
+    let entries: Vec<GlobalLeaderboardEntry> = top_players.iter()
+        .map(|stats| {
+            let kdratio = if stats.total_deaths > 0 {
+                stats.total_kills as f32 / stats.total_deaths as f32
+            } else {
+                stats.total_kills as f32
+            };
+
+            GlobalLeaderboardEntry {
+                player_id: stats.player_id,
+                name: stats.name.clone(),
+                total_kills: stats.total_kills,
+                total_deaths: stats.total_deaths,
+                total_score: stats.total_score,
+                games_played: stats.games_played,
+                kdratio,
+            }
+        })
+        .collect();
+
+    Json(entries)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

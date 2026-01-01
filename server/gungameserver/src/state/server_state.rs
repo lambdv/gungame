@@ -4,6 +4,13 @@ use std::sync::atomic::{AtomicU32, Ordering};
 use tokio::sync::{RwLock, mpsc};
 use tokio::task::JoinHandle;
 use crate::state::lobby::{Lobby, LobbyCode};
+use crate::state::global_stats::GlobalStats;
+
+/// Maximum allowed lobby code length
+const MAX_LOBBY_CODE_LENGTH: usize = 32;
+
+/// Maximum allowed player name length
+const MAX_PLAYER_NAME_LENGTH: usize = 64;
 
 /// Handle to a lobby with its command queue and tick task
 pub struct LobbyHandle {
@@ -17,6 +24,8 @@ pub struct LobbyHandle {
 pub struct ServerState {
     lobbies: DashMap<LobbyCode, LobbyHandle>,
     next_player_id: AtomicU32,
+    pub global_stats: Arc<GlobalStats>,
+    pub player_lobby_index: DashMap<u32, LobbyCode>,  // Player ID -> Lobby Code index for O(1) lookup
 }
 
 impl ServerState {
@@ -24,7 +33,34 @@ impl ServerState {
         Self {
             lobbies: DashMap::new(),
             next_player_id: AtomicU32::new(1),
+            global_stats: Arc::new(GlobalStats::new()),
+            player_lobby_index: DashMap::new(),
         }
+    }
+
+    /// Validate lobby code
+    pub fn is_valid_lobby_code(code: &str) -> bool {
+        !code.is_empty() && code.len() <= MAX_LOBBY_CODE_LENGTH && code.chars().all(|c| c.is_alphanumeric() || c == '_' || c == '-')
+    }
+
+    /// Validate player name
+    pub fn is_valid_player_name(name: &str) -> bool {
+        !name.is_empty() && name.len() <= MAX_PLAYER_NAME_LENGTH && name.chars().all(|c| c.is_alphanumeric() || c == '_' || c == '-' || c == ' ')
+    }
+
+    /// Register a player in the lobby index (call when player joins lobby)
+    pub fn register_player_lobby(&self, player_id: u32, lobby_code: &str) {
+        self.player_lobby_index.insert(player_id, lobby_code.to_string());
+    }
+
+    /// Unregister a player from the lobby index (call when player leaves)
+    pub fn unregister_player(&self, player_id: u32) {
+        self.player_lobby_index.remove(&player_id);
+    }
+
+    /// Find lobby code containing a specific player (O(1) lookup using index)
+    pub async fn find_lobby_by_player(&self, player_id: u32) -> Option<String> {
+        self.player_lobby_index.get(&player_id).map(|entry| entry.value().clone())
     }
 
     /// Get command sender for a lobby (for UDP handlers)
@@ -65,18 +101,6 @@ impl ServerState {
         self.lobbies.iter()
     }
 
-    /// Find lobby code containing a specific player
-    pub async fn find_lobby_by_player(&self, player_id: u32) -> Option<String> {
-        for entry in self.lobbies.iter() {
-            let code = entry.key();
-            let lobby = &entry.value().lobby;
-            if lobby.read().await.players.contains_key(&player_id) {
-                return Some(code.clone());
-            }
-        }
-        None
-    }
-
     /// Get lobby handle by code
     pub fn get_lobby_handle(&self, lobby_code: &str) -> Option<std::sync::Arc<tokio::sync::RwLock<crate::state::lobby::Lobby>>> {
         self.lobbies.get(lobby_code)
@@ -86,6 +110,16 @@ impl ServerState {
     /// Get lobby count
     pub fn lobby_count(&self) -> usize {
         self.lobbies.len()
+    }
+
+    /// Update player lobby index after player joins
+    pub fn on_player_joined(&self, player_id: u32, lobby_code: &str) {
+        self.register_player_lobby(player_id, lobby_code);
+    }
+
+    /// Update player lobby index after player leaves
+    pub fn on_player_left(&self, player_id: u32) {
+        self.unregister_player(player_id);
     }
 }
 
@@ -150,6 +184,41 @@ mod tests {
         // Can send command
         let addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 8080);
         retrieved_tx.unwrap().send(LobbyCommand::Heartbeat { player_id: 1, addr }).await.unwrap();
+    }
+
+    #[test]
+    fn test_valid_lobby_code() {
+        assert!(ServerState::is_valid_lobby_code("TEST123"));
+        assert!(ServerState::is_valid_lobby_code("lobby-name_123"));
+        assert!(!ServerState::is_valid_lobby_code(""));
+        let long_code = "a".repeat(33);
+        assert!(!ServerState::is_valid_lobby_code(&long_code));
+    }
+
+    #[test]
+    fn test_valid_player_name() {
+        assert!(ServerState::is_valid_player_name("Player1"));
+        assert!(ServerState::is_valid_player_name("John Doe"));
+        assert!(!ServerState::is_valid_player_name(""));
+        let long_name = "a".repeat(65);
+        assert!(!ServerState::is_valid_player_name(&long_name));
+    }
+
+    #[test]
+    fn test_player_lobby_index() {
+        let state = ServerState::new();
+        state.register_player_lobby(1, "LOBBY1");
+        state.register_player_lobby(2, "LOBBY2");
+        
+        let entry1 = state.player_lobby_index.get(&1);
+        let entry2 = state.player_lobby_index.get(&2);
+        assert!(entry1.is_some());
+        assert!(entry2.is_some());
+        assert_eq!(entry1.unwrap().value(), "LOBBY1");
+        assert_eq!(entry2.unwrap().value(), "LOBBY2");
+        
+        state.unregister_player(1);
+        assert!(state.player_lobby_index.get(&1).is_none());
     }
 }
 

@@ -1,7 +1,7 @@
-use crate::state::lobby::{Lobby, Player, LobbyCode};
+use crate::state::lobby::{Lobby, LobbyCode, Player};
 use crate::utils::weapondb::WeaponDb;
-use std::time::SystemTime;
 use std::net::SocketAddr;
+use std::time::SystemTime;
 
 /// Create a new lobby
 pub fn create_lobby(
@@ -33,7 +33,8 @@ pub fn add_player(
         return Err("Player already exists");
     }
 
-    let weapon = weapon_data.get(default_weapon_id)
+    let weapon = weapon_data
+        .get(default_weapon_id)
         .ok_or("Invalid default weapon")?;
 
     let player = Player {
@@ -49,7 +50,14 @@ pub fn add_player(
         max_ammo: weapon.ammo,
         is_reloading: false,
         reload_end_time: None,
-        last_shot_time: SystemTime::now(),
+        last_shot_time: SystemTime::UNIX_EPOCH,
+        kills: 0,
+        deaths: 0,
+        score: 0,
+        killstreak: 0,
+        warned_at: None,
+        is_dead: false,
+        respawn_time: None,
     };
 
     lobby.players.insert(player_id, player);
@@ -71,13 +79,15 @@ pub fn update_position(
     position: (f32, f32, f32),
     rotation: (f32, f32, f32),
 ) -> Result<(), &'static str> {
-    let player = lobby.players.get_mut(&player_id)
+    let player = lobby
+        .players
+        .get_mut(&player_id)
         .ok_or("Player not found")?;
 
     player.position = position;
     player.rotation = rotation;
     player.last_update = SystemTime::now();
-    
+
     lobby.mark_dirty(player_id);
     Ok(())
 }
@@ -95,24 +105,30 @@ pub fn set_player_address(
     Ok(())
 }
 
-/// Clean up inactive players
-/// Returns list of removed player IDs
+/// Clean up inactive players with warning system
+/// Returns tuple of (removed_player_ids, warned_player_ids)
 pub fn cleanup_inactive(
     lobby: &mut Lobby,
     timeout_secs: u64,
-) -> Vec<u32> {
+    warning_fraction: f64,
+) -> (Vec<u32>, Vec<u32>) {
     let now = SystemTime::now();
+    let warning_threshold = (timeout_secs as f64 * warning_fraction) as u64;
     let mut inactive_players = Vec::new();
+    let mut warned_players = Vec::new();
 
     for (player_id, player) in &lobby.players {
-        // Skip dummy bot (ID 999)
         if *player_id == 999 {
             continue;
         }
 
         if let Ok(duration) = now.duration_since(player.last_update) {
-            if duration.as_secs() > timeout_secs {
+            let elapsed_secs = duration.as_secs();
+
+            if elapsed_secs > timeout_secs {
                 inactive_players.push(*player_id);
+            } else if elapsed_secs > warning_threshold && player.warned_at.is_none() {
+                warned_players.push(*player_id);
             }
         }
     }
@@ -121,7 +137,13 @@ pub fn cleanup_inactive(
         remove_player(lobby, *player_id);
     }
 
-    inactive_players
+    for player_id in &warned_players {
+        if let Some(player) = lobby.players.get_mut(player_id) {
+            player.warned_at = Some(now);
+        }
+    }
+
+    (inactive_players, warned_players)
 }
 
 #[cfg(test)]
@@ -133,7 +155,7 @@ mod tests {
     fn test_add_player() {
         let mut lobby = Lobby::new("TEST".to_string(), 4, "world".to_string());
         let weapons = WeaponDb::load();
-        
+
         let result = add_player(&mut lobby, 1, "Player1".to_string(), 1, &weapons);
         assert!(result.is_ok());
         assert_eq!(lobby.players.len(), 1);
@@ -144,10 +166,10 @@ mod tests {
     fn test_add_player_full_lobby() {
         let mut lobby = Lobby::new("TEST".to_string(), 2, "world".to_string());
         let weapons = WeaponDb::load();
-        
+
         add_player(&mut lobby, 1, "Player1".to_string(), 1, &weapons).unwrap();
         add_player(&mut lobby, 2, "Player2".to_string(), 1, &weapons).unwrap();
-        
+
         let result = add_player(&mut lobby, 3, "Player3".to_string(), 1, &weapons);
         assert!(result.is_err());
     }
@@ -156,10 +178,10 @@ mod tests {
     fn test_remove_player() {
         let mut lobby = Lobby::new("TEST".to_string(), 4, "world".to_string());
         let weapons = WeaponDb::load();
-        
+
         add_player(&mut lobby, 1, "Player1".to_string(), 1, &weapons).unwrap();
         assert_eq!(lobby.players.len(), 1);
-        
+
         remove_player(&mut lobby, 1);
         assert_eq!(lobby.players.len(), 0);
     }
@@ -168,12 +190,12 @@ mod tests {
     fn test_update_position() {
         let mut lobby = Lobby::new("TEST".to_string(), 4, "world".to_string());
         let weapons = WeaponDb::load();
-        
+
         add_player(&mut lobby, 1, "Player1".to_string(), 1, &weapons).unwrap();
-        
+
         let result = update_position(&mut lobby, 1, (10.0, 2.0, 5.0), (0.0, 1.0, 0.0));
         assert!(result.is_ok());
-        
+
         let player = lobby.players.get(&1).unwrap();
         assert_eq!(player.position.0, 10.0);
         assert!(lobby.dirty_players.contains(&1));
@@ -183,18 +205,17 @@ mod tests {
     fn test_cleanup_inactive() {
         let mut lobby = Lobby::new("TEST".to_string(), 4, "world".to_string());
         let weapons = WeaponDb::load();
-        
+
         add_player(&mut lobby, 1, "Player1".to_string(), 1, &weapons).unwrap();
-        
+
         // Manually set old update time
         if let Some(player) = lobby.players.get_mut(&1) {
             player.last_update = SystemTime::now() - std::time::Duration::from_secs(20);
         }
-        
-        let removed = cleanup_inactive(&mut lobby, 15);
+
+        let (removed, _) = cleanup_inactive(&mut lobby, 15, 0.5);
         assert_eq!(removed.len(), 1);
         assert_eq!(removed[0], 1);
         assert_eq!(lobby.players.len(), 0);
     }
 }
-
