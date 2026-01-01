@@ -65,6 +65,24 @@ impl ServerState {
         self.lobbies.iter()
     }
 
+    /// Find lobby code containing a specific player
+    pub async fn find_lobby_by_player(&self, player_id: u32) -> Option<String> {
+        for entry in self.lobbies.iter() {
+            let code = entry.key();
+            let lobby = &entry.value().lobby;
+            if lobby.read().await.players.contains_key(&player_id) {
+                return Some(code.clone());
+            }
+        }
+        None
+    }
+
+    /// Get lobby handle by code
+    pub fn get_lobby_handle(&self, lobby_code: &str) -> Option<std::sync::Arc<tokio::sync::RwLock<crate::state::lobby::Lobby>>> {
+        self.lobbies.get(lobby_code)
+            .map(|entry| entry.lobby.clone())
+    }
+
     /// Get lobby count
     pub fn lobby_count(&self) -> usize {
         self.lobbies.len()

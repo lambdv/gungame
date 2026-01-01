@@ -3545,3 +3545,233 @@
 [2025-12-25][08:30:58][gungameserver::server][INFO] HTTP server successfully bound to 0.0.0.0:8080
 [2025-12-25][08:31:01][gungameserver::tick::lobby_tick][WARN] Failed to add player 1: Player already exists
 [2025-12-25][08:31:35][gungameserver::tick::lobby_tick][WARN] Failed to add player 2: Player already exists
+[2026-01-01][00:12:49][gungameserver][INFO] Created test lobby 'test'
+[2026-01-01][00:12:49][gungameserver::server][INFO] Starting HTTP server on 0.0.0.0:8080
+[2026-01-01][00:12:49][gungameserver::server][INFO] HTTP server successfully bound to 0.0.0.0:8080
+[2026-01-01][00:12:57][gungameserver::handlers::udp][INFO] UDP JOIN: Player Some(1) attempting to join lobby Some("test") from 127.0.0.1:61788
+[2026-01-01][00:12:59][gungameserver::handlers::udp][INFO] UDP JOIN: Player Some(2) attempting to join lobby Some("test") from 127.0.0.1:61789
+[2026-01-01][00:13:02][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:02][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:02][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:02][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:03][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:03][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:03][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:03][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:03][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:04][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:04][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:04][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:04][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:04][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:04][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:04][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:04][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:05][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:05][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:05][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:05][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:05][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:05][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:05][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:05][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:05][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:05][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:06][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:06][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:06][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:06][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:06][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:06][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:06][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:06][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:06][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:06][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:07][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:07][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:07][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:07][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:07][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:07][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:07][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:07][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:07][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:07][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:08][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:08][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:08][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:08][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:08][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:08][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:08][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:08][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:08][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:08][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:09][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:09][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:09][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:09][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:09][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:09][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:09][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:09][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:09][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:09][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:10][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:10][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:10][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:10][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:10][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:10][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:10][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:10][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:10][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:10][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:11][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:11][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:11][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:11][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:11][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:11][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:11][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:11][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:11][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:11][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:12][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:12][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:12][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:12][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:12][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:12][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:12][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:12][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:12][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:12][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:13][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:13][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:13][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:13][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:13][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:13][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:13][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:13][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:13][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:13][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:14][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:14][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:14][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:14][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:14][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:14][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:14][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:14][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:14][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:14][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:15][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:15][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:15][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:15][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:15][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:15][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:15][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:15][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:15][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:15][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:16][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:16][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:16][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:16][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:16][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:16][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:16][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:16][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:16][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:17][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:17][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:17][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:17][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:17][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:17][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:17][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:17][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:17][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:17][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:18][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:18][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(2) updating position in lobby None from 127.0.0.1:61789
+[2026-01-01][00:13:18][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:18][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:18][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:18][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:19][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:19][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:13:19][gungameserver::handlers::udp][INFO] UDP POSITION UPDATE: Player Some(1) updating position in lobby None from 127.0.0.1:61788
+[2026-01-01][00:21:23][gungameserver][INFO] Created test lobby 'test'
+[2026-01-01][00:21:23][gungameserver::server][INFO] Starting HTTP server on 0.0.0.0:8080
+[2026-01-01][00:21:23][gungameserver::server][INFO] HTTP server successfully bound to 0.0.0.0:8080
+[2026-01-01][00:21:31][gungameserver::handlers::udp][INFO] UDP JOIN: Player Some(1) (Unknown) attempting to join lobby Some("test") from 127.0.0.1:64205
+[2026-01-01][00:21:31][gungameserver::handlers::udp][INFO] Player 1 (Player_2133) successfully joined lobby test
+[2026-01-01][00:21:37][gungameserver::handlers::udp][INFO] UDP JOIN: Player Some(2) (Unknown) attempting to join lobby Some("8OITL9") from 127.0.0.1:64206
+[2026-01-01][00:21:37][gungameserver::handlers::udp][INFO] Player 2 (Player_8401) successfully joined lobby 8OITL9
+[2026-01-01][00:21:39][gungameserver::handlers::udp][INFO] UDP LEAVE: Player Some(2) leaving from 127.0.0.1:64206
+[2026-01-01][00:21:39][gungameserver::handlers::udp][INFO] Player 2 (Player_8401) left lobby 8OITL9
+[2026-01-01][00:21:41][gungameserver::handlers::udp][INFO] UDP JOIN: Player Some(3) (Unknown) attempting to join lobby Some("test") from 127.0.0.1:64207
+[2026-01-01][00:21:41][gungameserver::handlers::udp][INFO] Player 3 (Player_2956) successfully joined lobby test
+[2026-01-01][00:22:03][gungameserver::server][ERROR] UDP recv error: An existing connection was forcibly closed by the remote host. (os error 10054)
+[2026-01-01][00:22:03][gungameserver::server][ERROR] UDP recv error: An existing connection was forcibly closed by the remote host. (os error 10054)
+[2026-01-01][00:22:04][gungameserver::server][ERROR] UDP recv error: An existing connection was forcibly closed by the remote host. (os error 10054)
+[2026-01-01][00:22:04][gungameserver::server][ERROR] UDP recv error: An existing connection was forcibly closed by the remote host. (os error 10054)
+[2026-01-01][00:22:04][gungameserver::server][ERROR] UDP recv error: An existing connection was forcibly closed by the remote host. (os error 10054)
+[2026-01-01][00:22:04][gungameserver::server][ERROR] UDP recv error: An existing connection was forcibly closed by the remote host. (os error 10054)
+[2026-01-01][00:22:04][gungameserver::server][ERROR] UDP recv error: An existing connection was forcibly closed by the remote host. (os error 10054)
+[2026-01-01][00:22:05][gungameserver::server][ERROR] UDP recv error: An existing connection was forcibly closed by the remote host. (os error 10054)
+[2026-01-01][00:22:05][gungameserver::server][ERROR] UDP recv error: An existing connection was forcibly closed by the remote host. (os error 10054)
+[2026-01-01][00:22:05][gungameserver::server][ERROR] UDP recv error: An existing connection was forcibly closed by the remote host. (os error 10054)
+[2026-01-01][00:22:05][gungameserver::server][ERROR] UDP recv error: An existing connection was forcibly closed by the remote host. (os error 10054)
+[2026-01-01][00:22:05][gungameserver::server][ERROR] UDP recv error: An existing connection was forcibly closed by the remote host. (os error 10054)
+[2026-01-01][00:22:06][gungameserver::server][ERROR] UDP recv error: An existing connection was forcibly closed by the remote host. (os error 10054)
+[2026-01-01][00:22:06][gungameserver::server][ERROR] UDP recv error: An existing connection was forcibly closed by the remote host. (os error 10054)
+[2026-01-01][00:22:06][gungameserver::server][ERROR] UDP recv error: An existing connection was forcibly closed by the remote host. (os error 10054)
+[2026-01-01][00:22:06][gungameserver::server][ERROR] UDP recv error: An existing connection was forcibly closed by the remote host. (os error 10054)
+[2026-01-01][00:22:06][gungameserver::server][ERROR] UDP recv error: An existing connection was forcibly closed by the remote host. (os error 10054)
+[2026-01-01][00:22:07][gungameserver::server][ERROR] UDP recv error: An existing connection was forcibly closed by the remote host. (os error 10054)
+[2026-01-01][00:22:07][gungameserver::server][ERROR] UDP recv error: An existing connection was forcibly closed by the remote host. (os error 10054)
+[2026-01-01][00:22:07][gungameserver::server][ERROR] UDP recv error: An existing connection was forcibly closed by the remote host. (os error 10054)
+[2026-01-01][00:22:07][gungameserver::server][ERROR] UDP recv error: An existing connection was forcibly closed by the remote host. (os error 10054)
+[2026-01-01][00:22:07][gungameserver::server][ERROR] UDP recv error: An existing connection was forcibly closed by the remote host. (os error 10054)
+[2026-01-01][00:22:08][gungameserver::server][ERROR] UDP recv error: An existing connection was forcibly closed by the remote host. (os error 10054)
+[2026-01-01][00:22:08][gungameserver::server][ERROR] UDP recv error: An existing connection was forcibly closed by the remote host. (os error 10054)
+[2026-01-01][00:22:08][gungameserver::server][ERROR] UDP recv error: An existing connection was forcibly closed by the remote host. (os error 10054)
+[2026-01-01][00:22:08][gungameserver::server][ERROR] UDP recv error: An existing connection was forcibly closed by the remote host. (os error 10054)
+[2026-01-01][00:22:08][gungameserver::server][ERROR] UDP recv error: An existing connection was forcibly closed by the remote host. (os error 10054)
+[2026-01-01][00:22:09][gungameserver::server][ERROR] UDP recv error: An existing connection was forcibly closed by the remote host. (os error 10054)
+[2026-01-01][00:22:09][gungameserver::server][ERROR] UDP recv error: An existing connection was forcibly closed by the remote host. (os error 10054)
+[2026-01-01][00:22:09][gungameserver::server][ERROR] UDP recv error: An existing connection was forcibly closed by the remote host. (os error 10054)
+[2026-01-01][00:22:09][gungameserver::server][ERROR] UDP recv error: An existing connection was forcibly closed by the remote host. (os error 10054)
+[2026-01-01][00:22:09][gungameserver::server][ERROR] UDP recv error: An existing connection was forcibly closed by the remote host. (os error 10054)
+[2026-01-01][00:22:10][gungameserver::server][ERROR] UDP recv error: An existing connection was forcibly closed by the remote host. (os error 10054)
+[2026-01-01][00:30:44][gungameserver][INFO] Created test lobby 'test'
+[2026-01-01][00:30:44][gungameserver::server][INFO] Starting HTTP server on 0.0.0.0:8080
+[2026-01-01][00:30:44][gungameserver::server][INFO] HTTP server successfully bound to 0.0.0.0:8080
+[2026-01-01][01:00:39][gungameserver::handlers::udp][INFO] UDP JOIN: Player Some(1) (Unknown) attempting to join lobby Some("test") from 127.0.0.1:60242
+[2026-01-01][01:00:39][gungameserver::handlers::udp][INFO] Player 1 (Player_3996) successfully joined lobby test
+[2026-01-01][01:00:41][gungameserver::handlers::udp][INFO] UDP JOIN: Player Some(2) (Unknown) attempting to join lobby Some("test") from 127.0.0.1:60243
+[2026-01-01][01:00:41][gungameserver::handlers::udp][INFO] Player 2 (Player_6540) successfully joined lobby test
+[2026-01-01][01:01:03][gungameserver::handlers::udp][INFO] UDP WEAPON SWITCH: Player Some(1) switching to weapon Some(2)
+[2026-01-01][01:01:03][gungameserver::handlers::udp][INFO] UDP WEAPON SWITCH: Player Some(1) switching to weapon Some(3)
+[2026-01-01][01:01:05][gungameserver::handlers::udp][INFO] UDP WEAPON SWITCH: Player Some(2) switching to weapon Some(2)
+[2026-01-01][01:01:06][gungameserver::handlers::udp][INFO] UDP WEAPON SWITCH: Player Some(2) switching to weapon Some(3)
+[2026-01-01][01:01:07][gungameserver::handlers::udp][INFO] UDP LEAVE: Player Some(2) leaving from 127.0.0.1:60243
+[2026-01-01][01:01:07][gungameserver::handlers::udp][INFO] Player 2 (Player_6540) left lobby test
+[2026-01-01][01:01:08][gungameserver::handlers::udp][INFO] UDP JOIN: Player Some(3) (Unknown) attempting to join lobby Some("test") from 127.0.0.1:50305
+[2026-01-01][01:01:08][gungameserver::handlers::udp][INFO] Player 3 (Player_3001) successfully joined lobby test
+[2026-01-01][01:01:09][gungameserver::handlers::udp][INFO] UDP WEAPON SWITCH: Player Some(3) switching to weapon Some(2)
+[2026-01-01][01:01:12][gungameserver::handlers::udp][INFO] UDP LEAVE: Player Some(1) leaving from 127.0.0.1:60242
+[2026-01-01][01:01:12][gungameserver::handlers::udp][INFO] Player 1 (Player_3996) left lobby test
+[2026-01-01][01:01:13][gungameserver::handlers::udp][INFO] UDP JOIN: Player Some(4) (Unknown) attempting to join lobby Some("test") from 127.0.0.1:50306
+[2026-01-01][01:01:13][gungameserver::handlers::udp][INFO] Player 4 (Player_7833) successfully joined lobby test
+[2026-01-01][01:01:15][gungameserver::handlers::udp][INFO] UDP WEAPON SWITCH: Player Some(4) switching to weapon Some(2)
+[2026-01-01][01:01:18][gungameserver::handlers::udp][INFO] UDP WEAPON SWITCH: Player Some(3) switching to weapon Some(1)
+[2026-01-01][01:01:19][gungameserver::handlers::udp][INFO] UDP WEAPON SWITCH: Player Some(3) switching to weapon Some(2)
+[2026-01-01][01:01:20][gungameserver::handlers::udp][INFO] UDP WEAPON SWITCH: Player Some(4) switching to weapon Some(1)
+[2026-01-01][01:01:22][gungameserver::handlers::udp][INFO] UDP WEAPON SWITCH: Player Some(4) switching to weapon Some(1)
+[2026-01-01][01:01:22][gungameserver::handlers::udp][INFO] UDP WEAPON SWITCH: Player Some(4) switching to weapon Some(2)

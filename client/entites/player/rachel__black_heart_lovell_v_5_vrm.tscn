@@ -27,3 +27,5 @@ visible = false
 
 [node name="node_c4c909ae_1658_4cec_925e_84abfd841349" parent="node_154fe3da_1de3_44c7_8cfa_b5cc375820e8/node_fc3aba1b_9a55_4285_b046_64a9f5b2c445" index="3"]
 visible = false
+
+[node name="Skeleton3D" type="Skeleton3D" parent="node_154fe3da_1de3_44c7_8cfa_b5cc375820e8" index="1"]

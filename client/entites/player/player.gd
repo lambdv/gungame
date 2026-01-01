@@ -546,6 +546,7 @@ func _on_network_damage_received(damaged_player_id: int, damage_amount: int, att
 ## @param new_position: Server-authoritative position
 ## @param new_rotation: Server-authoritative rotation
 func update_target_position(new_position: Vector3, new_rotation: Vector3) -> void:
+	print("DEBUG: update_target_position called for player ", player_id, " is_local=", is_local, " pos=", new_position, " rot=", new_rotation)
 	if is_local:
 		# For local players, check if server position differs significantly from local position
 		var position_difference = global_position.distance_to(new_position)
@@ -571,7 +572,12 @@ func update_target_position(new_position: Vector3, new_rotation: Vector3) -> voi
 		else:
 			# Subsequent updates - set interpolation target
 			target_position = new_position
+			
+			# Always update rotation for remote players (server-authoritative)
 			target_rotation = new_rotation
+			rotation.y = -new_rotation.x  # Apply rotation immediately
+			if character_model:
+				character_model.rotation.x = new_rotation.y
 
 	last_position_update = Time.get_ticks_msec() / 1000.0
 

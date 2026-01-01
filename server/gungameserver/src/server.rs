@@ -88,7 +88,7 @@ async fn init_udp_server(
                 Ok((len, addr)) => {
                     let data = &buf[..len];
                     if let Ok(packet) = serde_json::from_slice::<serde_json::Value>(data) {
-                        handle_udp_packet(packet, addr, &state_clone).await;
+                        handle_udp_packet(packet, addr, &socket_clone, &state_clone).await;
                     }
                 }
                 Err(e) => {
